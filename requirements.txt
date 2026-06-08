@@ -1,0 +1,59 @@
+# =============================================================================
+# requirements.txt
+# Tese: Arquitetura de Escolha e Nudges Digitais no E-commerce Brasileiro
+# Pipeline de análise MINDSPACE — KaBuM! Black Friday 2020–2025
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Core — processamento de dados e visualização
+# -----------------------------------------------------------------------------
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+
+# -----------------------------------------------------------------------------
+# HTTP assíncrono — chamadas às APIs de modelos (OpenAI-compatible endpoints)
+# -----------------------------------------------------------------------------
+httpx>=0.27
+
+# -----------------------------------------------------------------------------
+# Configuração — carregamento dos arquivos YAML de prompts
+# -----------------------------------------------------------------------------
+PyYAML>=6.0
+
+# -----------------------------------------------------------------------------
+# Processamento de imagens — capturas do Wayback Machine
+# -----------------------------------------------------------------------------
+Pillow>=10.0
+
+# -----------------------------------------------------------------------------
+# Automação de navegador — captura de screenshots via Wayback Machine
+# -----------------------------------------------------------------------------
+selenium>=4.20
+webdriver-manager>=4.0
+
+# -----------------------------------------------------------------------------
+# Web frameworks — ferramentas de revisão manual
+#   revisors/revisor_ti  →  Flask (porta 5051)
+#   revisors/revisor_tr  →  Flask (porta 5050)
+#   image_slicer         →  FastAPI + Uvicorn (porta 8080)
+# -----------------------------------------------------------------------------
+flask>=3.0
+fastapi>=0.111
+uvicorn>=0.30
+pydantic>=2.7
+
+# =============================================================================
+# Dependências opcionais — Fine-tuning LoRA (requer GPU NVIDIA com CUDA)
+# =============================================================================
+# Descomente o bloco abaixo apenas no ambiente de fine-tuning.
+# Recomendado: CUDA 12.1+, VRAM >= 24 GB, Ubuntu 22.04/24.04.
+# Instale via: pip install -r requirements-finetune.txt
+#
+# torch>=2.3
+# transformers>=4.43
+# peft>=0.11
+# trl>=0.9
+# datasets>=2.20
+# unsloth>=2024.10          # instalar via: pip install unsloth[colab-new] ou unsloth[cu121]
+# bitsandbytes>=0.43        # quantização 4-bit / 8-bit

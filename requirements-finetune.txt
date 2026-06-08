@@ -1,0 +1,22 @@
+# =============================================================================
+# requirements-finetune.txt
+# Dependências opcionais para o pipeline de fine-tuning LoRA
+# Requer: GPU NVIDIA, CUDA 12.1+, VRAM >= 24 GB
+# =============================================================================
+
+# Instale primeiro: pip install -r requirements.txt
+# Depois: pip install -r requirements-finetune.txt
+
+torch>=2.3
+transformers>=4.43
+peft>=0.11
+trl>=0.9
+datasets>=2.20
+bitsandbytes>=0.43
+
+# Unsloth — instalar conforme o ambiente:
+#   Colab / Kaggle:  pip install unsloth[colab-new]
+#   CUDA 12.1:       pip install unsloth[cu121]
+#   CUDA 12.4:       pip install unsloth[cu124]
+# Documentação: https://docs.unsloth.ai/get-started/installing-+-updating
+unsloth

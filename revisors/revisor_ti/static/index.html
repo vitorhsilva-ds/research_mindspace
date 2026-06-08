@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Interface Review</title>
+<style>
+:root {
+  --background:#0d1117;
+  --surface:#161c26;
+  --panel:#1e2636;
+  --panel-strong:#242e42;
+  --border:#2a3550;
+  --border-strong:#374569;
+  --text:#cdd6f4;
+  --muted:#7d8fb3;
+  --faint:#3d4f73;
+  --accent:#89b4fa;
+  --accent-alt:#74c7ec;
+  --success:#a6e3a1;
+  --warning:#f9e2af;
+  --danger:#f38ba8;
+  --mauve:#cba6f7;
+  --peach:#fab387;
+  --teal:#94e2d5;
+  --component-M:#89b4fa;
+  --component-I:#f9e2af;
+  --component-N:#a6e3a1;
+  --component-D:#cba6f7;
+  --component-S:#74c7ec;
+  --component-P:#fab387;
+  --component-A:#f38ba8;
+  --component-C:#94e2d5;
+  --component-E:#b4befe;
+  --font-mono:ui-monospace,"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --font-sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --radius:6px;
+  --transition:140ms ease;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--background);
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-size:13px;
+  line-height:1.55;
+}
+
+#app{
+  display:grid;
+  height:100vh;
+  grid-template-rows:44px 1fr;
+}
+
+#topbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 14px;
+  user-select:none;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+
+.logo{
+  color:var(--teal);
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.07em;
+  white-space:nowrap;
+}
+
+.spacer{flex:1}
+
+.counter{
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:12px;
+}
+
+.counter strong{color:var(--text)}
+
+.badge{
+  padding:2px 7px;
+  border-radius:99px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.04em;
+}
+
+.badge-ok{color:var(--success);background:#1e3a28}
+.badge-warn{color:var(--warning);background:#3a2a0e}
+.badge-err{color:var(--danger);background:#3a1a1a}
+.badge-info{color:var(--accent-alt);background:#1a2a3a}
+.badge-dirty{color:var(--mauve);background:#2a1e38}
+
+.key{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:20px;
+  padding:1px 5px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+}
+
+.key-label{
+  margin-right:2px;
+  color:var(--faint);
+  font-size:10px;
+}
+
+.top-button{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:3px 9px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  background:transparent;
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  transition:background var(--transition),color var(--transition);
+}
+
+.top-button:hover{
+  color:var(--text);
+  background:var(--panel);
+}
+
+.button-save{color:var(--success);border-color:var(--success)}
+.button-save:hover{background:#1a2e1e}
+.button-revert{color:var(--danger);border-color:var(--danger)}
+.button-revert:hover{background:#2e1a1a}
+.button-nav{color:var(--accent);border-color:var(--accent)}
+.button-nav:hover{background:#1a2338}
+
+#main{
+  display:grid;
+  grid-template-columns:1fr 420px;
+  overflow:hidden;
+}
+
+#image-pane{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:var(--background);
+  border-right:1px solid var(--border);
+}
+
+#image-header{
+  display:flex;
+  align-items:center;
+  flex-shrink:0;
+  gap:8px;
+  padding:7px 14px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+
+.file-id{
+  color:var(--teal);
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+}
+
+.file-path{
+  max-width:500px;
+  overflow:hidden;
+  color:var(--faint);
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.zoom-bar{
+  display:flex;
+  flex-shrink:0;
+  align-items:center;
+  gap:6px;
+  margin-left:auto;
+}
+
+.zoom-button{
+  padding:2px 8px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:12px;
+  cursor:pointer;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+  transition:background var(--transition),color var(--transition);
+}
+
+.zoom-button:hover{
+  color:var(--text);
+  background:var(--panel-strong);
+}
+
+.zoom-value{
+  min-width:36px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  text-align:center;
+}
+
+#image-viewport{
+  display:flex;
+  flex:1;
+  align-items:flex-start;
+  justify-content:center;
+  padding:16px;
+  overflow:auto;
+  cursor:grab;
+}
+
+#image-viewport:active{cursor:grabbing}
+
+#image-viewport img{
+  display:block;
+  max-width:none;
+  border-radius:4px;
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+  transform-origin:top center;
+  transition:transform 200ms ease;
+}
+
+.image-placeholder{
+  padding:40px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:12px;
+  text-align:center;
+}
+
+#progress-wrap{
+  flex-shrink:0;
+  height:2px;
+  background:var(--panel);
+}
+
+#progress-bar{
+  height:100%;
+  background:var(--teal);
+  transition:width 280ms ease;
+}
+
+#edit-pane{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:var(--surface);
+}
+
+#metadata-panel{
+  display:flex;
+  flex-wrap:wrap;
+  flex-shrink:0;
+  gap:5px;
+  align-items:center;
+  padding:8px 12px;
+  border-bottom:1px solid var(--border);
+}
+
+.metadata-chip{
+  padding:2px 7px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+
+.metadata-chip span{color:var(--text)}
+
+#review-pill{
+  display:none;
+  padding:2px 8px;
+  color:var(--warning);
+  font-family:var(--font-mono);
+  font-size:9px;
+  font-weight:600;
+  background:#3a2a0e;
+  border:1px solid #6a4a0e;
+  border-radius:99px;
+}
+
+#component-list{
+  flex:1;
+  padding:6px 8px;
+  overflow-y:auto;
+}
+
+.component-card{
+  margin-bottom:5px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  transition:border-color var(--transition);
+}
+
+.component-card.active{border-color:var(--component-color)}
+
+.component-header{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  user-select:none;
+  cursor:pointer;
+  background:var(--panel);
+  transition:background var(--transition);
+}
+
+.component-header:hover{background:var(--panel-strong)}
+
+.component-card.active .component-header{
+  background:color-mix(in srgb,var(--component-color) 10%,var(--panel));
+}
+
+.component-toggle{
+  display:flex;
+  flex-shrink:0;
+  align-items:center;
+  justify-content:center;
+  width:16px;
+  height:16px;
+  border:1.5px solid var(--border-strong);
+  border-radius:4px;
+  transition:all var(--transition);
+}
+
+.component-toggle svg{display:none}
+
+.component-card.active .component-toggle{
+  background:color-mix(in srgb,var(--component-color) 20%,transparent);
+  border-color:var(--component-color);
+}
+
+.component-card.active .component-toggle svg{display:block}
+.component-card.active .component-toggle svg path{stroke:var(--component-color)}
+
+.component-code{
+  flex-shrink:0;
+  width:18px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:14px;
+  font-weight:700;
+}
+
+.component-card.active .component-code{color:var(--component-color)}
+
+.component-name{
+  flex:1;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.component-card.active .component-name{color:var(--text)}
+
+.instance-wrap{
+  display:flex;
+  flex-shrink:0;
+  align-items:center;
+  gap:4px;
+}
+
+.instance-label{
+  color:var(--faint);
+  font-family:var(--font-mono);
+  font-size:9px;
+}
+
+.instance-input{
+  width:32px;
+  padding:1px 3px;
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-align:center;
+  outline:none;
+  background:var(--panel-strong);
+  border:1px solid var(--border-strong);
+  border-radius:3px;
+  transition:border-color var(--transition);
+}
+
+.instance-input:focus{border-color:var(--component-color,var(--accent))}
+
+.component-chevron{
+  flex-shrink:0;
+  color:var(--faint);
+  font-size:10px;
+  transition:transform var(--transition);
+}
+
+.component-card.active .component-chevron{transform:rotate(90deg)}
+
+.component-body{
+  display:none;
+  flex-direction:column;
+  gap:6px;
+  padding:8px 10px;
+  background:var(--background);
+  border-top:1px solid var(--border);
+}
+
+.component-card.active .component-body{display:flex}
+
+.component-field-label{
+  margin-bottom:2px;
+  color:var(--faint);
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+
+.component-textarea{
+  width:100%;
+  min-height:52px;
+  padding:6px 8px;
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-size:12px;
+  line-height:1.5;
+  resize:vertical;
+  outline:none;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+  transition:border-color var(--transition);
+}
+
+.component-textarea:focus{border-color:var(--component-color,var(--accent))}
+
+.component-M{--component-color:var(--component-M)}
+.component-I{--component-color:var(--component-I)}
+.component-N{--component-color:var(--component-N)}
+.component-D{--component-color:var(--component-D)}
+.component-S{--component-color:var(--component-S)}
+.component-P{--component-color:var(--component-P)}
+.component-A{--component-color:var(--component-A)}
+.component-C{--component-color:var(--component-C)}
+.component-E{--component-color:var(--component-E)}
+
+#edit-bottom{
+  display:flex;
+  flex-direction:column;
+  flex-shrink:0;
+  gap:6px;
+  padding:8px 12px;
+  border-top:1px solid var(--border);
+}
+
+.field-row{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.field-label{
+  flex-shrink:0;
+  width:90px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+}
+
+.field-select{
+  flex:1;
+  padding:3px 7px;
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:11px;
+  outline:none;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  transition:border-color var(--transition);
+}
+
+.field-select:focus{border-color:var(--accent)}
+.field-select option{background:var(--surface)}
+
+.review-box{
+  padding:5px 8px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  border-radius:4px;
+}
+
+.review-box.has-flag{
+  color:var(--warning);
+  background:#1e1800;
+  border:1px solid #4a3800;
+}
+
+.review-box.no-flag{
+  color:var(--faint);
+  background:var(--panel);
+  border:1px solid var(--border);
+}
+
+#toast-container{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  pointer-events:none;
+}
+
+.toast{
+  padding:8px 14px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:500;
+  border:1px solid transparent;
+  border-radius:var(--radius);
+  opacity:0;
+  animation:toast-in 180ms ease forwards;
+}
+
+.toast-ok{color:var(--success);background:#1a2e1e;border-color:var(--success)}
+.toast-err{color:var(--danger);background:#2e1a1a;border-color:var(--danger)}
+.toast-info{color:var(--accent);background:#1a2338;border-color:var(--accent)}
+.toast-warn{color:var(--warning);background:#2e280e;border-color:var(--warning)}
+
+@keyframes toast-in{
+  from{opacity:0;transform:translateX(16px)}
+  to{opacity:1;transform:none}
+}
+
+#dirty-badge{display:none}
+
+.shortcuts{
+  display:flex;
+  gap:5px;
+  align-items:center;
+}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="logo">INTERFACE REVIEW</div>
+    <span id="csv-badge" class="badge badge-info">loading...</span>
+    <span class="counter">item <strong id="current-index">–</strong> of <strong id="total-count">–</strong></span>
+    <span id="dirty-badge" class="badge badge-dirty">● unsaved</span>
+    <div class="spacer"></div>
+    <div class="shortcuts">
+      <span class="key-label">nav</span>
+      <span class="key">A</span><span class="key">D</span>
+      <span class="key">←</span><span class="key">→</span>
+      <span style="margin:0 3px;color:var(--faint)">|</span>
+      <span class="key-label">save</span><span class="key">B</span>
+      <span class="key-label">revert</span><span class="key">E</span>
+      <span style="margin:0 3px;color:var(--faint)">|</span>
+      <span class="key-label">zoom</span><span class="key">+</span><span class="key">−</span>
+    </div>
+    <button class="top-button button-nav" id="previous-button">Previous</button>
+    <button class="top-button button-nav" id="next-button">Next</button>
+    <button class="top-button button-save" id="save-button">Save</button>
+    <button class="top-button button-revert" id="revert-button">Revert</button>
+  </div>
+
+  <div id="main">
+    <div id="image-pane">
+      <div id="image-header">
+        <span id="file-id" class="file-id">–</span>
+        <span id="file-path" class="file-path">–</span>
+        <div class="zoom-bar">
+          <button class="zoom-button" id="zoom-out-button">−</button>
+          <span class="zoom-value" id="zoom-value">100%</span>
+          <button class="zoom-button" id="zoom-in-button">+</button>
+          <button class="zoom-button" id="zoom-fit-button" title="Fit to view">⊡</button>
+          <button class="zoom-button" id="zoom-reset-button" title="100%">1:1</button>
+        </div>
+      </div>
+
+      <div id="progress-wrap">
+        <div id="progress-bar" style="width:0%"></div>
+      </div>
+
+      <div id="image-viewport">
+        <div class="image-placeholder" id="image-placeholder">Loading image...</div>
+        <img id="record-image" src="" alt="" style="display:none"/>
+      </div>
+    </div>
+
+    <div id="edit-pane">
+      <div id="metadata-panel">
+        <span id="review-pill">needs review</span>
+      </div>
+
+      <div id="component-list"></div>
+
+      <div id="edit-bottom">
+        <div class="field-row">
+          <span class="field-label">needs_review</span>
+          <select class="field-select" id="field-needs-review">
+            <option value="1">1 — yes</option>
+            <option value="0">0 — no</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">parse_ok</span>
+          <select class="field-select" id="field-parse-ok">
+            <option value="1">1 — ok</option>
+            <option value="0">0 — error</option>
+          </select>
+        </div>
+
+        <div id="review-box" class="review-box no-flag">–</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const componentDefinitions = Object.freeze([
+  { key: 'M', name: 'Messenger' },
+  { key: 'I', name: 'Incentives' },
+  { key: 'N', name: 'Norms' },
+  { key: 'D', name: 'Defaults' },
+  { key: 'S', name: 'Salience' },
+  { key: 'P', name: 'Priming' },
+  { key: 'A', name: 'Affect' },
+  { key: 'C', name: 'Commitments' },
+  { key: 'E', name: 'Ego' },
+]);
+
+class ReviewState {
+  constructor() {
+    this.rows = [];
+    this.fieldnames = [];
+    this.currentIndex = 0;
+    this.dirty = false;
+    this.zoomLevel = 1;
+    this.imageNaturalWidth = 0;
+    this.imageNaturalHeight = 0;
+  }
+
+  hasRows() {
+    return this.rows.length > 0;
+  }
+
+  currentRow() {
+    return this.rows[this.currentIndex] || null;
+  }
+
+  setDirty(value) {
+    this.dirty = value;
+  }
+}
+
+class DomRegistry {
+  constructor() {
+    this.csvBadge = document.getElementById('csv-badge');
+    this.currentIndex = document.getElementById('current-index');
+    this.totalCount = document.getElementById('total-count');
+    this.dirtyBadge = document.getElementById('dirty-badge');
+    this.fileId = document.getElementById('file-id');
+    this.filePath = document.getElementById('file-path');
+    this.progressBar = document.getElementById('progress-bar');
+    this.imageViewport = document.getElementById('image-viewport');
+    this.imagePlaceholder = document.getElementById('image-placeholder');
+    this.recordImage = document.getElementById('record-image');
+    this.zoomValue = document.getElementById('zoom-value');
+    this.metadataPanel = document.getElementById('metadata-panel');
+    this.reviewPill = document.getElementById('review-pill');
+    this.componentList = document.getElementById('component-list');
+    this.fieldNeedsReview = document.getElementById('field-needs-review');
+    this.fieldParseOk = document.getElementById('field-parse-ok');
+    this.reviewBox = document.getElementById('review-box');
+    this.toastContainer = document.getElementById('toast-container');
+    this.previousButton = document.getElementById('previous-button');
+    this.nextButton = document.getElementById('next-button');
+    this.saveButton = document.getElementById('save-button');
+    this.revertButton = document.getElementById('revert-button');
+    this.zoomOutButton = document.getElementById('zoom-out-button');
+    this.zoomInButton = document.getElementById('zoom-in-button');
+    this.zoomFitButton = document.getElementById('zoom-fit-button');
+    this.zoomResetButton = document.getElementById('zoom-reset-button');
+  }
+}
+
+class ApiGateway {
+  async getStatus() {
+    return this.fetchJson('/api/status');
+  }
+
+  async getRows() {
+    return this.fetchJson('/api/rows');
+  }
+
+  async saveRow(index, updates) {
+    return this.fetchJson('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, updates }),
+    });
+  }
+
+  async revertRow(index) {
+    return this.fetchJson('/api/revert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index }),
+    });
+  }
+
+  imageUrl(index) {
+    return `/api/image/${index}?t=${Date.now()}`;
+  }
+
+  async fetchJson(url, options = undefined) {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+
+    return response.json();
+  }
+}
+
+class NotificationService {
+  constructor(dom) {
+    this.dom = dom;
+  }
+
+  toast(message, type = 'ok') {
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast toast-${type}`;
+    toastElement.textContent = message;
+    this.dom.toastContainer.appendChild(toastElement);
+
+    requestAnimationFrame(() => {
+      toastElement.style.opacity = '1';
+    });
+
+    setTimeout(() => {
+      toastElement.style.transition = 'opacity 280ms';
+      toastElement.style.opacity = '0';
+
+      setTimeout(() => toastElement.remove(), 280);
+    }, 2400);
+  }
+
+  showFatalError(error) {
+    document.body.innerHTML = `
+      <div style="padding:40px;font-family:monospace;color:#f38ba8;background:#0d1117;height:100vh">
+        <div style="font-size:16px;margin-bottom:12px">Initialization failed</div>
+        <div style="color:#cdd6f4;font-size:13px;white-space:pre-wrap">${error.stack || error.message || String(error)}</div>
+      </div>
+    `;
+  }
+}
+
+class StatusRenderer {
+  constructor(dom) {
+    this.dom = dom;
+  }
+
+  render(statusPayload) {
+    if (statusPayload.has_working) {
+      this.dom.csvBadge.textContent = statusPayload.working_csv.split('/').pop();
+      this.dom.csvBadge.className = 'badge badge-ok';
+      return;
+    }
+
+    if (statusPayload.has_original) {
+      this.dom.csvBadge.textContent = 'source available';
+      this.dom.csvBadge.className = 'badge badge-warn';
+      return;
+    }
+
+    this.dom.csvBadge.textContent = 'source unavailable';
+    this.dom.csvBadge.className = 'badge badge-err';
+  }
+}
+
+class ComponentListRenderer {
+  constructor(state, dom) {
+    this.state = state;
+    this.dom = dom;
+  }
+
+  build() {
+    this.dom.componentList.innerHTML = '';
+
+    componentDefinitions.forEach((component) => {
+      const item = document.createElement('div');
+      item.className = `component-card component-${component.key}`;
+      item.id = `component-card-${component.key}`;
+      item.innerHTML = `
+        <div class="component-header" data-component="${component.key}">
+          <div class="component-toggle">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M1.5 5.5L4.5 8.5L9.5 2.5" stroke="white" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="component-code">${component.key}</span>
+          <span class="component-name">${component.name}</span>
+          <div class="instance-wrap">
+            <span class="instance-label">inst</span>
+            <input class="instance-input" type="number" min="0" id="inst-${component.key}" value="0"/>
+          </div>
+          <span class="component-chevron">▶</span>
+        </div>
+        <div class="component-body" id="body-${component.key}">
+          <div>
+            <div class="component-field-label">Evidence</div>
+            <textarea class="component-textarea" id="ev-${component.key}" rows="3" placeholder="Observed evidence"></textarea>
+          </div>
+          <div>
+            <div class="component-field-label">Location</div>
+            <textarea class="component-textarea" id="loc-${component.key}" rows="2" placeholder="Interface location"></textarea>
+          </div>
+        </div>
+      `;
+      this.dom.componentList.appendChild(item);
+    });
+
+    this.bindComponentEvents();
+  }
+
+  bindComponentEvents() {
+    componentDefinitions.forEach((component) => {
+      const card = document.getElementById(`component-card-${component.key}`);
+      const header = card.querySelector('.component-header');
+      const input = document.getElementById(`inst-${component.key}`);
+
+      header.addEventListener('click', (event) => {
+        if (event.target.closest('.instance-wrap')) {
+          return;
+        }
+
+        this.toggleComponent(component.key);
+      });
+
+      input.addEventListener('input', () => this.markDirty());
+
+      document.getElementById(`ev-${component.key}`).addEventListener('input', () => this.markDirty());
+      document.getElementById(`loc-${component.key}`).addEventListener('input', () => this.markDirty());
+    });
+  }
+
+  toggleComponent(componentKey) {
+    const card = document.getElementById(`component-card-${componentKey}`);
+    card.classList.toggle('active');
+
+    if (card.classList.contains('active')) {
+      const instanceInput = document.getElementById(`inst-${componentKey}`);
+
+      if (parseInt(instanceInput.value, 10) === 0) {
+        instanceInput.value = 1;
+      }
+    } else {
+      document.getElementById(`inst-${componentKey}`).value = 0;
+    }
+
+    this.markDirty();
+  }
+
+  markDirty() {
+    this.state.setDirty(true);
+    this.dom.dirtyBadge.style.display = 'inline-block';
+  }
+}
+
+class RowRenderer {
+  constructor(state, dom, apiGateway, notificationService) {
+    this.state = state;
+    this.dom = dom;
+    this.apiGateway = apiGateway;
+    this.notificationService = notificationService;
+  }
+
+  render(index) {
+    if (!this.state.hasRows()) {
+      this.renderEmptyState();
+      return;
+    }
+
+    this.state.currentIndex = Math.max(0, Math.min(index, this.state.rows.length - 1));
+    const row = this.state.currentRow();
+
+    this.dom.currentIndex.textContent = this.state.currentIndex + 1;
+    this.dom.progressBar.style.width = (
+      (this.state.currentIndex + 1) / this.state.rows.length * 100
+    ).toFixed(1) + '%';
+    this.dom.fileId.textContent = row.id || '–';
+    this.dom.filePath.textContent = row.filepath || '–';
+
+    this.renderMetadata(row);
+    this.renderComponentValues(row);
+    this.setSelectValue(this.dom.fieldNeedsReview, String(row.needs_review ?? '0'));
+    this.setSelectValue(this.dom.fieldParseOk, String(row.parse_ok ?? '1'));
+    this.renderReviewBox(row);
+
+    this.state.setDirty(false);
+    this.dom.dirtyBadge.style.display = 'none';
+    this.loadImage(this.state.currentIndex);
+  }
+
+  renderEmptyState() {
+    this.dom.currentIndex.textContent = '0';
+    this.dom.fileId.textContent = 'No records loaded';
+    this.dom.filePath.textContent = 'Check whether the configured source CSV exists.';
+    this.dom.imagePlaceholder.textContent = 'No item loaded.';
+    this.dom.imagePlaceholder.style.color = 'var(--warning)';
+  }
+
+  renderMetadata(row) {
+    const needsReview = row.needs_review === '1' || row.needs_review === true;
+    this.dom.reviewPill.style.display = needsReview ? 'inline-flex' : 'none';
+    this.dom.metadataPanel.innerHTML = '';
+    this.dom.metadataPanel.appendChild(this.dom.reviewPill);
+
+    [
+      ['year', row.ano],
+      ['type', row.tipo_pagina],
+      ['window', row.janela],
+      ['locus', row.locus],
+      ['session', (row.session_ts || '').slice(0, 8)],
+    ].forEach(([label, value]) => {
+      if (!value) {
+        return;
+      }
+
+      const chip = document.createElement('span');
+      chip.className = 'metadata-chip';
+      chip.innerHTML = `${label} <span>${value}</span>`;
+      this.dom.metadataPanel.insertBefore(chip, this.dom.reviewPill);
+    });
+  }
+
+  renderComponentValues(row) {
+    componentDefinitions.forEach((component) => {
+      const card = document.getElementById(`component-card-${component.key}`);
+      const active = row[component.key] === '1' || row[component.key] === 1 || row[component.key] === true;
+      card.classList.toggle('active', active);
+      document.getElementById(`inst-${component.key}`).value = row[`${component.key}_inst`] || '0';
+      document.getElementById(`ev-${component.key}`).value = row[`${component.key}_ev`] || '';
+      document.getElementById(`loc-${component.key}`).value = row[`${component.key}_loc`] || '';
+    });
+  }
+
+  renderReviewBox(row) {
+    if (row.review_reasons) {
+      this.dom.reviewBox.textContent = row.review_reasons;
+      this.dom.reviewBox.className = 'review-box has-flag';
+      return;
+    }
+
+    this.dom.reviewBox.textContent = '–';
+    this.dom.reviewBox.className = 'review-box no-flag';
+  }
+
+  setSelectValue(selectElement, value) {
+    Array.from(selectElement.options).some((option) => {
+      if (option.value === value || option.text === value) {
+        selectElement.value = option.value;
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  loadImage(index) {
+    this.dom.recordImage.style.display = 'none';
+    this.dom.imagePlaceholder.style.display = 'block';
+    this.dom.imagePlaceholder.textContent = 'Loading image...';
+    this.dom.recordImage.src = this.apiGateway.imageUrl(index);
+  }
+}
+
+class ZoomController {
+  constructor(state, dom) {
+    this.state = state;
+    this.dom = dom;
+  }
+
+  bindEvents() {
+    this.dom.zoomOutButton.addEventListener('click', () => this.step(-0.25));
+    this.dom.zoomInButton.addEventListener('click', () => this.step(0.25));
+    this.dom.zoomFitButton.addEventListener('click', () => this.fit());
+    this.dom.zoomResetButton.addEventListener('click', () => this.reset());
+
+    this.dom.imageViewport.addEventListener('wheel', (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+        this.step(event.deltaY < 0 ? 0.1 : -0.1);
+      }
+    }, { passive: false });
+
+    this.dom.recordImage.addEventListener('load', () => this.onImageLoad());
+    this.dom.recordImage.addEventListener('error', () => this.onImageError());
+  }
+
+  onImageLoad() {
+    this.state.imageNaturalWidth = this.dom.recordImage.naturalWidth;
+    this.state.imageNaturalHeight = this.dom.recordImage.naturalHeight;
+    this.dom.imagePlaceholder.style.display = 'none';
+    this.dom.recordImage.style.display = 'block';
+    this.fit();
+  }
+
+  onImageError() {
+    const row = this.state.currentRow();
+    this.dom.imagePlaceholder.style.display = 'block';
+    this.dom.imagePlaceholder.textContent = `Image not found: ${(row && row.filepath) || '–'}`;
+    this.dom.imagePlaceholder.style.color = 'var(--danger)';
+    this.dom.recordImage.style.display = 'none';
+  }
+
+  apply() {
+    this.dom.recordImage.style.transform = `scale(${this.state.zoomLevel})`;
+    this.dom.zoomValue.textContent = Math.round(this.state.zoomLevel * 100) + '%';
+  }
+
+  step(delta) {
+    this.state.zoomLevel = Math.max(0.1, Math.min(5, this.state.zoomLevel + delta));
+    this.apply();
+  }
+
+  fit() {
+    if (!this.state.imageNaturalWidth || !this.state.imageNaturalHeight) {
+      this.state.zoomLevel = 1;
+      this.apply();
+      return;
+    }
+
+    const scaleWidth = (this.dom.imageViewport.offsetWidth - 32) / this.state.imageNaturalWidth;
+    const scaleHeight = (this.dom.imageViewport.offsetHeight - 32) / this.state.imageNaturalHeight;
+    this.state.zoomLevel = Math.min(scaleWidth, scaleHeight, 2);
+    this.apply();
+    this.dom.imageViewport.scrollTop = 0;
+    this.dom.imageViewport.scrollLeft = 0;
+  }
+
+  reset() {
+    this.state.zoomLevel = 1;
+    this.apply();
+  }
+}
+
+class EditCollectionService {
+  collect() {
+    const updates = {};
+
+    componentDefinitions.forEach((component) => {
+      const card = document.getElementById(`component-card-${component.key}`);
+      updates[component.key] = card.classList.contains('active') ? '1' : '0';
+      updates[`${component.key}_inst`] = document.getElementById(`inst-${component.key}`).value;
+      updates[`${component.key}_ev`] = document.getElementById(`ev-${component.key}`).value;
+      updates[`${component.key}_loc`] = document.getElementById(`loc-${component.key}`).value;
+    });
+
+    updates.needs_review = document.getElementById('field-needs-review').value;
+    updates.parse_ok = document.getElementById('field-parse-ok').value;
+
+    return updates;
+  }
+}
+
+class ReviewWorkflowController {
+  constructor(
+    state,
+    dom,
+    apiGateway,
+    notificationService,
+    rowRenderer,
+    editCollectionService
+  ) {
+    this.state = state;
+    this.dom = dom;
+    this.apiGateway = apiGateway;
+    this.notificationService = notificationService;
+    this.rowRenderer = rowRenderer;
+    this.editCollectionService = editCollectionService;
+  }
+
+  bindEvents() {
+    this.dom.fieldNeedsReview.addEventListener('change', () => this.markDirty());
+    this.dom.fieldParseOk.addEventListener('change', () => this.markDirty());
+    this.dom.saveButton.addEventListener('click', () => this.saveCurrentItem());
+    this.dom.revertButton.addEventListener('click', () => this.revertCurrentItem());
+    this.dom.previousButton.addEventListener('click', () => this.navigate(-1));
+    this.dom.nextButton.addEventListener('click', () => this.navigate(1));
+
+    document.addEventListener('keydown', (event) => this.handleKeyboard(event));
+  }
+
+  markDirty() {
+    this.state.setDirty(true);
+    this.dom.dirtyBadge.style.display = 'inline-block';
+  }
+
+  async saveCurrentItem() {
+    if (!this.state.hasRows()) {
+      return;
+    }
+
+    const updates = this.editCollectionService.collect();
+
+    try {
+      const response = await this.apiGateway.saveRow(this.state.currentIndex, updates);
+
+      if (response.ok) {
+        Object.assign(this.state.rows[this.state.currentIndex], updates);
+        this.state.setDirty(false);
+        this.dom.dirtyBadge.style.display = 'none';
+        this.notificationService.toast(`Item ${this.state.currentIndex + 1} saved`, 'ok');
+        return;
+      }
+
+      this.notificationService.toast(`Save failed: ${response.error || '?'}`, 'err');
+    } catch {
+      this.notificationService.toast('Save request failed.', 'err');
+    }
+  }
+
+  async revertCurrentItem() {
+    if (!this.state.hasRows()) {
+      return;
+    }
+
+    try {
+      const response = await this.apiGateway.revertRow(this.state.currentIndex);
+
+      if (response.ok) {
+        Object.assign(this.state.rows[this.state.currentIndex], response.row);
+        this.rowRenderer.render(this.state.currentIndex);
+        this.notificationService.toast(`Item ${this.state.currentIndex + 1} reverted`, 'warn');
+        return;
+      }
+
+      this.notificationService.toast(`Revert failed: ${response.error || '?'}`, 'err');
+    } catch {
+      this.notificationService.toast('Revert request failed.', 'err');
+    }
+  }
+
+  async navigate(delta) {
+    this.dom.fieldNeedsReview.value = '0';
+    this.markDirty();
+    await this.saveCurrentItem();
+
+    const nextIndex = this.state.currentIndex + delta;
+
+    if (nextIndex < 0 || nextIndex >= this.state.rows.length) {
+      this.notificationService.toast(delta > 0 ? 'End of list.' : 'Start of list.', 'info');
+      return;
+    }
+
+    this.rowRenderer.render(nextIndex);
+  }
+
+  handleKeyboard(event) {
+    const tagName = document.activeElement.tagName;
+    const isTyping = (
+      tagName === 'TEXTAREA'
+      || tagName === 'INPUT'
+      || document.activeElement.isContentEditable
+    );
+
+    if (isTyping) {
+      return;
+    }
+
+    if (event.key === 'b' || event.key === 'B') {
+      event.preventDefault();
+      this.saveCurrentItem();
+      return;
+    }
+
+    if (event.key === 'e' || event.key === 'E') {
+      event.preventDefault();
+      this.revertCurrentItem();
+      return;
+    }
+
+    if (event.key === '+' || event.key === '=') {
+      event.preventDefault();
+      window.reviewApplication.zoomController.step(0.25);
+      return;
+    }
+
+    if (event.key === '-' || event.key === '_') {
+      event.preventDefault();
+      window.reviewApplication.zoomController.step(-0.25);
+      return;
+    }
+
+    if (event.key === '0') {
+      event.preventDefault();
+      window.reviewApplication.zoomController.fit();
+      return;
+    }
+
+    if (event.key === 'ArrowLeft' || event.key === 'a' || event.key === 'A') {
+      event.preventDefault();
+      this.navigate(-1);
+      return;
+    }
+
+    if (event.key === 'ArrowRight' || event.key === 'd' || event.key === 'D') {
+      event.preventDefault();
+      this.navigate(1);
+    }
+  }
+}
+
+class ReviewApplication {
+  constructor() {
+    this.state = new ReviewState();
+    this.dom = new DomRegistry();
+    this.apiGateway = new ApiGateway();
+    this.notificationService = new NotificationService(this.dom);
+    this.statusRenderer = new StatusRenderer(this.dom);
+    this.componentListRenderer = new ComponentListRenderer(this.state, this.dom);
+    this.rowRenderer = new RowRenderer(
+      this.state,
+      this.dom,
+      this.apiGateway,
+      this.notificationService
+    );
+    this.zoomController = new ZoomController(this.state, this.dom);
+    this.workflowController = new ReviewWorkflowController(
+      this.state,
+      this.dom,
+      this.apiGateway,
+      this.notificationService,
+      this.rowRenderer,
+      new EditCollectionService()
+    );
+  }
+
+  async start() {
+    try {
+      window.addEventListener('error', (event) => {
+        this.notificationService.showFatalError(event.error || event);
+      });
+      window.addEventListener('unhandledrejection', (event) => {
+        this.notificationService.showFatalError(event.reason);
+      });
+
+      const statusPayload = await this.apiGateway.getStatus();
+      this.statusRenderer.render(statusPayload);
+
+      const rowsPayload = await this.apiGateway.getRows();
+      this.state.rows = rowsPayload.rows || [];
+      this.state.fieldnames = rowsPayload.fieldnames || [];
+      this.dom.totalCount.textContent = this.state.rows.length;
+
+      const firstReviewIndex = this.state.rows.findIndex((row) => (
+        row.needs_review === '1' || row.needs_review === true
+      ));
+      this.state.currentIndex = firstReviewIndex >= 0 ? firstReviewIndex : 0;
+
+      this.componentListRenderer.build();
+      this.zoomController.bindEvents();
+      this.workflowController.bindEvents();
+      this.rowRenderer.render(this.state.currentIndex);
+    } catch (error) {
+      this.notificationService.showFatalError(error);
+    }
+  }
+}
+
+window.reviewApplication = new ReviewApplication();
+window.reviewApplication.start();
+</script>
+</body>
+</html>

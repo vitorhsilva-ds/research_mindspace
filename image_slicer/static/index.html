@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Slicer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --background: #0a0c0f;
+      --surface: #111418;
+      --panel: #161b22;
+      --border: #1e2530;
+      --accent: #00e5ff;
+      --danger: #ff4757;
+      --text: #c9d1d9;
+      --muted: #484f58;
+      --success: #3fb950;
+      --font-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--background);
+      color: var(--text);
+      font-family: var(--font-mono);
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 50px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .brand-mark span { color: var(--text); }
+
+    .path-display {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 10px;
+      overflow: hidden;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: var(--background);
+      border: 1px solid var(--border);
+    }
+
+    .keyboard-hint {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    kbd {
+      padding: 1px 5px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      background: var(--border);
+      border: 1px solid var(--muted);
+    }
+
+    .button {
+      flex-shrink: 0;
+      padding: 5px 12px;
+      color: #000;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      background: var(--accent);
+      border: none;
+      transition: opacity .15s;
+    }
+
+    .button:hover { opacity: .8; }
+
+    .button.outline {
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    .button.outline:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .workspace {
+      display: flex;
+      height: calc(100vh - 50px);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      width: 200px;
+      overflow: hidden;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      padding: 8px 10px 7px;
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      padding: 1px 5px;
+      color: var(--muted);
+      font-size: 9px;
+      background: var(--border);
+    }
+
+    .browser-navigation {
+      display: flex;
+      flex-shrink: 0;
+      gap: 4px;
+      align-items: center;
+      padding: 5px 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .up-button {
+      padding: 2px 7px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      cursor: pointer;
+      background: none;
+      border: 1px solid var(--border);
+    }
+
+    .up-button:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .current-path {
+      flex: 1;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 9px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .browser-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .browser-list::-webkit-scrollbar,
+    .slice-list::-webkit-scrollbar { width: 3px; }
+
+    .browser-list::-webkit-scrollbar-thumb,
+    .slice-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .browser-entry {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      padding: 6px 10px;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 10px;
+      white-space: nowrap;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: background .1s;
+    }
+
+    .browser-entry:hover { background: var(--panel); }
+
+    .browser-entry.active {
+      color: var(--accent);
+      background: rgba(0, 229, 255, .06);
+      border-left-color: var(--accent);
+    }
+
+    .browser-entry .icon {
+      flex-shrink: 0;
+      font-size: 11px;
+    }
+
+    .browser-entry .name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .browser-entry .thumbnail {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .browser-group {
+      padding: 5px 10px 2px;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 8px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+    }
+
+    .browser-group:first-child {
+      margin-top: 0;
+      border-top: none;
+    }
+
+    .empty-message {
+      padding: 20px 10px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.9;
+      text-align: center;
+    }
+
+    .viewer {
+      position: relative;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .viewer-bar {
+      display: flex;
+      flex-shrink: 0;
+      gap: 10px;
+      align-items: center;
+      min-height: 36px;
+      height: 36px;
+      padding: 6px 14px;
+      color: var(--muted);
+      font-size: 10px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .current-name {
+      overflow: hidden;
+      color: var(--text);
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slice-count {
+      flex-shrink: 0;
+      margin-left: auto;
+      color: var(--success);
+      white-space: nowrap;
+    }
+
+    .mode-badge {
+      flex-shrink: 0;
+      padding: 2px 8px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .mode-selection { color: #000; background: var(--accent); }
+    .mode-ready { color: #000; background: var(--success); }
+
+    .size-label {
+      color: var(--muted);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .crop-actions {
+      display: flex;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .canvas-area {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(255,255,255,.013) 30px, rgba(255,255,255,.013) 31px),
+        repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(255,255,255,.013) 30px, rgba(255,255,255,.013) 31px),
+        var(--background);
+    }
+
+    #canvasScroll {
+      position: absolute;
+      inset: 0;
+      overflow: auto;
+    }
+
+    #canvasScroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    #canvasScroll::-webkit-scrollbar-track { background: var(--background); }
+
+    #canvasScroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 0;
+    }
+
+    #canvasScroll::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+    #canvasScroll::-webkit-scrollbar-corner { background: var(--background); }
+
+    #canvasWrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100%;
+      min-height: 100%;
+      padding: 24px;
+    }
+
+    #mainCanvas {
+      display: block;
+      flex-shrink: 0;
+      box-shadow: 0 0 60px rgba(0,0,0,.8), 0 0 0 1px var(--border);
+    }
+
+    .welcome {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .welcome .icon {
+      font-size: 44px;
+      opacity: .25;
+    }
+
+    .hint-bar {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      z-index: 10;
+      color: rgba(255,255,255,.22);
+      font-size: 9px;
+      letter-spacing: .1em;
+      white-space: nowrap;
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+
+    .zoom-badge {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 10;
+      padding: 2px 7px;
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: .05em;
+      pointer-events: none;
+      background: rgba(0,0,0,.55);
+      border: 1px solid var(--border);
+    }
+
+    .zoom-badge.active {
+      color: var(--accent);
+      border-color: rgba(0,229,255,.3);
+    }
+
+    .slice-panel {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      width: 155px;
+      overflow: hidden;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+    }
+
+    .slice-list {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 4px;
+      padding: 5px;
+      overflow-y: auto;
+    }
+
+    .slice-card {
+      cursor: pointer;
+      background: var(--background);
+      border: 1px solid var(--border);
+      transition: border-color .15s;
+    }
+
+    .slice-card:hover { border-color: var(--accent); }
+
+    .slice-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+
+    .slice-card .label {
+      padding: 2px 4px;
+      color: var(--muted);
+      font-size: 9px;
+      text-align: center;
+    }
+
+    .no-slices {
+      padding: 16px 8px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.9;
+      text-align: center;
+    }
+
+    #flash {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      pointer-events: none;
+      background: rgba(255,255,255,.13);
+      opacity: 0;
+      transition: opacity .05s;
+    }
+
+    #flash.on { opacity: 1; }
+
+    #toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 300;
+      padding: 7px 14px;
+      color: #000;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      pointer-events: none;
+      background: var(--success);
+      opacity: 0;
+      transform: translateY(50px);
+      transition: transform .2s, opacity .2s;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #toast.error {
+      color: #fff;
+      background: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand-mark">IMAGE<span>SLICER</span></div>
+    <div class="path-display" id="pathDisplay">—</div>
+    <div class="keyboard-hint">
+      Select: <kbd>W</kbd>
+      Confirm: <kbd>W</kbd>
+      Cancel: <kbd>ESC</kbd>
+      Zoom: <kbd>Shift</kbd> + scroll
+      Reset: <kbd>0</kbd>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="panel-header">Explorer <span class="badge" id="imageCount">0</span></div>
+      <div class="browser-navigation">
+        <button class="up-button" id="navigateUpButton" title="Open parent folder">↑</button>
+        <span class="current-path" id="currentPath">—</span>
+      </div>
+      <div class="browser-list" id="browserList">
+        <div class="empty-message">Loading...</div>
+      </div>
+    </aside>
+
+    <main class="viewer">
+      <div class="viewer-bar" id="viewerBar">
+        <span class="current-name" id="currentName">—</span>
+        <span class="slice-count" id="sliceCount"></span>
+      </div>
+
+      <div class="canvas-area" id="canvasArea">
+        <div class="welcome" id="welcomeMessage">
+          <div class="icon">□</div>
+          Select an image
+        </div>
+
+        <div id="canvasScroll">
+          <div id="canvasWrap">
+            <canvas id="mainCanvas" style="display:none;"></canvas>
+          </div>
+        </div>
+
+        <div class="hint-bar" id="hintBar" style="display:none;">Press W to start selection</div>
+        <div class="zoom-badge" id="zoomBadge" style="display:none;">100%</div>
+      </div>
+    </main>
+
+    <aside class="slice-panel">
+      <div class="panel-header">Slices <span class="badge" id="slicesCount">0</span></div>
+      <div class="slice-list" id="slicesList">
+        <div class="no-slices">No slices yet</div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="flash"></div>
+  <div id="toast"></div>
+
+  <script>
+    const selectionState = Object.freeze({
+      idle: 0,
+      drawing: 1,
+      ready: 2,
+    });
+
+    const zoomPolicy = Object.freeze({
+      min: 0.05,
+      max: 12,
+      step: 0.12,
+    });
+
+    class ApplicationState {
+      constructor() {
+        this.currentFolder = '';
+        this.currentImage = '';
+        this.browsedPath = '';
+        this.loadedImage = null;
+        this.zoom = 1;
+        this.fitZoom = 1;
+        this.selectionMode = selectionState.idle;
+        this.dragStart = null;
+        this.dragEnd = null;
+        this.finalCrop = null;
+        this.isMouseDown = false;
+      }
+
+      resetSelection() {
+        this.selectionMode = selectionState.idle;
+        this.dragStart = null;
+        this.dragEnd = null;
+        this.finalCrop = null;
+        this.isMouseDown = false;
+      }
+    }
+
+    class DomRegistry {
+      constructor() {
+        this.pathDisplay = document.getElementById('pathDisplay');
+        this.currentPath = document.getElementById('currentPath');
+        this.browserList = document.getElementById('browserList');
+        this.imageCount = document.getElementById('imageCount');
+        this.welcomeMessage = document.getElementById('welcomeMessage');
+        this.canvas = document.getElementById('mainCanvas');
+        this.context = this.canvas.getContext('2d');
+        this.canvasScroll = document.getElementById('canvasScroll');
+        this.hintBar = document.getElementById('hintBar');
+        this.zoomBadge = document.getElementById('zoomBadge');
+        this.viewerBar = document.getElementById('viewerBar');
+        this.slicesList = document.getElementById('slicesList');
+        this.slicesCount = document.getElementById('slicesCount');
+        this.flash = document.getElementById('flash');
+        this.toast = document.getElementById('toast');
+        this.navigateUpButton = document.getElementById('navigateUpButton');
+      }
+    }
+
+    class ApiGateway {
+      async browse(path) {
+        return this.fetchJson(`/api/browse?path=${encodeURIComponent(path)}`);
+      }
+
+      async saveSlice(folder, imageName, imageData) {
+        return this.fetchJson('/api/save-slice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            folder,
+            image_name: imageName,
+            image_data: imageData,
+          }),
+        });
+      }
+
+      async listSlices(folder, imageName) {
+        return this.fetchJson(
+          `/api/list-slices?folder=${encodeURIComponent(folder)}&image_name=${encodeURIComponent(imageName)}`
+        );
+      }
+
+      imageUrl(folder, filename) {
+        return `/api/image?folder=${encodeURIComponent(folder)}&filename=${encodeURIComponent(filename)}`;
+      }
+
+      sliceImageUrl(folder, filename) {
+        return `/api/slice-image?folder=${encodeURIComponent(folder)}&filename=${encodeURIComponent(filename)}`;
+      }
+
+      async fetchJson(url, options = undefined) {
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+
+        return response.json();
+      }
+    }
+
+    class NotificationService {
+      constructor(dom) {
+        this.dom = dom;
+        this.toastTimer = null;
+      }
+
+      showToast(message, isError = false) {
+        clearTimeout(this.toastTimer);
+        this.dom.toast.textContent = message;
+        this.dom.toast.className = 'show' + (isError ? ' error' : '');
+        this.toastTimer = setTimeout(() => {
+          this.dom.toast.className = '';
+        }, 2800);
+      }
+
+      flash() {
+        this.dom.flash.classList.add('on');
+        setTimeout(() => {
+          this.dom.flash.classList.remove('on');
+        }, 110);
+      }
+    }
+
+    class BrowserRenderer {
+      constructor(state, dom, apiGateway, notificationService, viewerController) {
+        this.state = state;
+        this.dom = dom;
+        this.apiGateway = apiGateway;
+        this.notificationService = notificationService;
+        this.viewerController = viewerController;
+      }
+
+      async browse(path) {
+        try {
+          const data = await this.apiGateway.browse(path);
+          this.render(data);
+        } catch {
+          this.notificationService.showToast('Invalid path', true);
+        }
+      }
+
+      browseUp() {
+        this.browse(`${this.state.browsedPath}/..`);
+      }
+
+      render(data) {
+        this.state.browsedPath = data.path;
+        this.dom.currentPath.textContent = data.path;
+        this.dom.pathDisplay.textContent = data.path;
+        this.dom.imageCount.textContent = data.images.length;
+        this.dom.browserList.innerHTML = '';
+
+        if (data.dirs.length) {
+          this.addGroup('Folders');
+          data.dirs.forEach((directoryName) => {
+            this.dom.browserList.appendChild(
+              this.createEntry('DIR', directoryName, () => {
+                this.browse(`${data.path}/${directoryName}`);
+              })
+            );
+          });
+        }
+
+        if (data.images.length) {
+          this.addGroup('Images');
+          data.images.forEach((imageName) => {
+            const entry = this.createEntry(null, imageName, () => {
+              document.querySelectorAll('.browser-entry').forEach((element) => {
+                element.classList.remove('active');
+              });
+              entry.classList.add('active');
+              this.viewerController.selectImage(data.path, imageName);
+            });
+
+            const thumbnail = document.createElement('img');
+            thumbnail.className = 'thumbnail';
+            thumbnail.src = this.apiGateway.imageUrl(data.path, imageName);
+            thumbnail.onerror = () => thumbnail.remove();
+            entry.insertBefore(thumbnail, entry.firstChild);
+            this.dom.browserList.appendChild(entry);
+          });
+        }
+
+        if (!data.dirs.length && !data.images.length) {
+          this.dom.browserList.innerHTML = '<div class="empty-message">Empty folder</div>';
+        }
+      }
+
+      addGroup(label) {
+        const group = document.createElement('div');
+        group.className = 'browser-group';
+        group.textContent = label;
+        this.dom.browserList.appendChild(group);
+      }
+
+      createEntry(icon, name, callback) {
+        const entry = document.createElement('div');
+        entry.className = 'browser-entry';
+
+        if (icon) {
+          const iconElement = document.createElement('span');
+          iconElement.className = 'icon';
+          iconElement.textContent = icon;
+          entry.appendChild(iconElement);
+        }
+
+        const nameElement = document.createElement('span');
+        nameElement.className = 'name';
+        nameElement.textContent = name;
+        entry.appendChild(nameElement);
+        entry.addEventListener('click', callback);
+
+        return entry;
+      }
+    }
+
+    class SliceRenderer {
+      constructor(state, dom, apiGateway) {
+        this.state = state;
+        this.dom = dom;
+        this.apiGateway = apiGateway;
+      }
+
+      async loadSlices(imageName) {
+        try {
+          const data = await this.apiGateway.listSlices(this.state.currentFolder, imageName);
+          this.render(data.slices);
+        } catch {
+          this.render([]);
+        }
+      }
+
+      render(slices) {
+        this.dom.slicesCount.textContent = slices.length;
+        this.refreshSliceCount();
+
+        if (!slices.length) {
+          this.dom.slicesList.innerHTML = '<div class="no-slices">No slices yet</div>';
+          return;
+        }
+
+        this.dom.slicesList.innerHTML = '';
+
+        slices.forEach((sliceName) => {
+          const card = document.createElement('div');
+          card.className = 'slice-card';
+
+          const image = document.createElement('img');
+          image.src = this.apiGateway.sliceImageUrl(this.state.currentFolder, sliceName);
+
+          const label = document.createElement('div');
+          label.className = 'label';
+          label.textContent = sliceName.replace(/.*_slice_/, '#');
+
+          card.appendChild(image);
+          card.appendChild(label);
+          this.dom.slicesList.appendChild(card);
+        });
+
+        this.dom.slicesList.scrollTop = this.dom.slicesList.scrollHeight;
+      }
+
+      refreshSliceCount() {
+        const sliceCount = document.getElementById('sliceCount');
+
+        if (sliceCount) {
+          const count = parseInt(this.dom.slicesCount.textContent, 10);
+          sliceCount.textContent = count > 0 ? `${count} slice(s)` : '';
+        }
+      }
+    }
+
+    class ViewerBarRenderer {
+      constructor(state, dom, sliceRenderer) {
+        this.state = state;
+        this.dom = dom;
+        this.sliceRenderer = sliceRenderer;
+      }
+
+      renderIdle() {
+        this.dom.viewerBar.innerHTML = `
+          <span class="current-name">${this.state.currentImage || '—'}</span>
+          <span class="slice-count" id="sliceCount"></span>
+        `;
+        this.sliceRenderer.refreshSliceCount();
+      }
+
+      renderDrawing() {
+        this.dom.viewerBar.innerHTML = `
+          <span class="mode-badge mode-selection">Selecting</span>
+          <span style="font-size:9px;color:var(--muted)">Click and drag the target area</span>
+          <span style="margin-left:auto;font-size:9px;color:var(--muted)">ESC cancels</span>
+        `;
+      }
+
+      renderReady(width, height) {
+        this.dom.viewerBar.innerHTML = `
+          <span class="mode-badge mode-ready">Ready</span>
+          <span class="size-label">${width} × ${height} px</span>
+          <div class="crop-actions">
+            <button class="button outline" id="cancelSelectionButton">Cancel</button>
+            <button class="button" id="confirmSliceButton">Save slice (W)</button>
+          </div>
+        `;
+
+        document.getElementById('cancelSelectionButton').addEventListener('click', () => {
+          window.imageSlicerApp.viewerController.cancelSelection();
+        });
+
+        document.getElementById('confirmSliceButton').addEventListener('click', () => {
+          window.imageSlicerApp.viewerController.confirmSlice();
+        });
+      }
+    }
+
+    class CanvasSelectionController {
+      constructor(state, dom, viewerBarRenderer) {
+        this.state = state;
+        this.dom = dom;
+        this.viewerBarRenderer = viewerBarRenderer;
+      }
+
+      bindEvents() {
+        this.dom.canvas.addEventListener('mousedown', (event) => {
+          if (this.state.selectionMode !== selectionState.drawing) {
+            return;
+          }
+
+          event.preventDefault();
+          this.state.isMouseDown = true;
+          this.state.dragStart = this.toImagePixel(event.pageX - window.scrollX, event.pageY - window.scrollY);
+          this.state.dragEnd = { ...this.state.dragStart };
+          this.redrawSelection();
+        });
+
+        window.addEventListener('mousemove', (event) => {
+          if (this.state.selectionMode !== selectionState.drawing || !this.state.isMouseDown) {
+            return;
+          }
+
+          this.state.dragEnd = this.toImagePixel(event.pageX - window.scrollX, event.pageY - window.scrollY);
+          this.redrawSelection();
+        });
+
+        window.addEventListener('mouseup', (event) => {
+          if (this.state.selectionMode !== selectionState.drawing || !this.state.isMouseDown) {
+            return;
+          }
+
+          this.state.isMouseDown = false;
+
+          if (!this.state.dragStart) {
+            return;
+          }
+
+          this.state.dragEnd = this.toImagePixel(event.pageX - window.scrollX, event.pageY - window.scrollY);
+          const width = Math.abs(this.state.dragEnd.x - this.state.dragStart.x);
+          const height = Math.abs(this.state.dragEnd.y - this.state.dragStart.y);
+
+          if (width < 5 || height < 5) {
+            this.state.dragStart = null;
+            this.state.dragEnd = null;
+            this.redrawImage();
+            return;
+          }
+
+          this.state.finalCrop = {
+            x: Math.min(this.state.dragStart.x, this.state.dragEnd.x),
+            y: Math.min(this.state.dragStart.y, this.state.dragEnd.y),
+            width,
+            height,
+          };
+          this.state.selectionMode = selectionState.ready;
+          this.redrawSelection();
+          this.viewerBarRenderer.renderReady(width, height);
+          this.dom.hintBar.style.display = 'none';
+        });
+      }
+
+      toImagePixel(viewportX, viewportY) {
+        const canvasRect = this.dom.canvas["getBounding" + "Cl" + "ientRect"]();
+
+        return {
+          x: Math.max(
+            0,
+            Math.min(
+              this.dom.canvas.width,
+              Math.round((viewportX - canvasRect.left) / canvasRect.width * this.dom.canvas.width)
+            )
+          ),
+          y: Math.max(
+            0,
+            Math.min(
+              this.dom.canvas.height,
+              Math.round((viewportY - canvasRect.top) / canvasRect.height * this.dom.canvas.height)
+            )
+          ),
+        };
+      }
+
+      redrawImage() {
+        if (!this.state.loadedImage) {
+          return;
+        }
+
+        this.dom.context.clearRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
+        this.dom.context.drawImage(this.state.loadedImage, 0, 0);
+      }
+
+      redrawSelection() {
+        if (!this.state.loadedImage || !this.state.dragStart) {
+          return;
+        }
+
+        this.redrawImage();
+
+        const x = Math.min(this.state.dragStart.x, this.state.dragEnd.x);
+        const y = Math.min(this.state.dragStart.y, this.state.dragEnd.y);
+        const width = Math.abs(this.state.dragEnd.x - this.state.dragStart.x);
+        const height = Math.abs(this.state.dragEnd.y - this.state.dragStart.y);
+        const lineWidth = Math.max(1, Math.round(this.dom.canvas.width / 700));
+        const cornerSize = Math.max(10, Math.round(this.dom.canvas.width / 80));
+
+        this.dom.context.fillStyle = 'rgba(0,0,0,0.52)';
+        this.dom.context.fillRect(0, 0, this.dom.canvas.width, this.dom.canvas.height);
+        this.dom.context.clearRect(x, y, width, height);
+        this.dom.context.drawImage(
+          this.state.loadedImage,
+          x,
+          y,
+          width,
+          height,
+          x,
+          y,
+          width,
+          height
+        );
+
+        this.dom.context.strokeStyle = '#00e5ff';
+        this.dom.context.lineWidth = lineWidth;
+        this.dom.context.setLineDash([
+          Math.max(5, this.dom.canvas.width / 160),
+          Math.max(3, this.dom.canvas.width / 280),
+        ]);
+        this.dom.context.strokeRect(
+          x + lineWidth,
+          y + lineWidth,
+          width - lineWidth * 2,
+          height - lineWidth * 2
+        );
+        this.dom.context.setLineDash([]);
+
+        this.dom.context.lineWidth = lineWidth * 2;
+        [
+          [x, y, 1, 1],
+          [x + width, y, -1, 1],
+          [x, y + height, 1, -1],
+          [x + width, y + height, -1, -1],
+        ].forEach(([cornerX, cornerY, directionX, directionY]) => {
+          this.dom.context.beginPath();
+          this.dom.context.moveTo(cornerX + directionX * cornerSize, cornerY);
+          this.dom.context.lineTo(cornerX, cornerY);
+          this.dom.context.lineTo(cornerX, cornerY + directionY * cornerSize);
+          this.dom.context.stroke();
+        });
+      }
+    }
+
+    class ZoomController {
+      constructor(state, dom) {
+        this.state = state;
+        this.dom = dom;
+      }
+
+      bindEvents() {
+        this.dom.canvasScroll.addEventListener('wheel', (event) => {
+          if (!event.shiftKey || !this.state.loadedImage) {
+            return;
+          }
+
+          event.preventDefault();
+          const factor = event.deltaY < 0 ? (1 + zoomPolicy.step) : (1 - zoomPolicy.step);
+          this.applyZoom(this.state.zoom * factor, event.pageX - window.scrollX, event.pageY - window.scrollY);
+        }, { passive: false });
+      }
+
+      applyZoom(newZoom, viewportX = undefined, viewportY = undefined) {
+        newZoom = Math.min(zoomPolicy.max, Math.max(zoomPolicy.min, newZoom));
+        let imageX;
+        let imageY;
+        let mouseX;
+        let mouseY;
+
+        if (viewportX !== undefined) {
+          const canvasRect = this.dom.canvas["getBounding" + "Cl" + "ientRect"]();
+          imageX = (viewportX - canvasRect.left) / canvasRect.width * this.dom.canvas.width;
+          imageY = (viewportY - canvasRect.top) / canvasRect.height * this.dom.canvas.height;
+
+          const scrollRect = this.dom.canvasScroll["getBounding" + "Cl" + "ientRect"]();
+          mouseX = viewportX - scrollRect.left;
+          mouseY = viewportY - scrollRect.top;
+        }
+
+        this.state.zoom = newZoom;
+        this.dom.canvas.style.width = `${Math.round(this.dom.canvas.width * this.state.zoom)}px`;
+        this.dom.canvas.style.height = `${Math.round(this.dom.canvas.height * this.state.zoom)}px`;
+
+        const percentage = Math.round(this.state.zoom * 100);
+        this.dom.zoomBadge.textContent = `${percentage}%`;
+        this.dom.zoomBadge.className = 'zoom-badge'
+          + (Math.abs(this.state.zoom - this.state.fitZoom) > 0.01 ? ' active' : '');
+
+        if (viewportX !== undefined) {
+          requestAnimationFrame(() => {
+            const scrollRect = this.dom.canvasScroll["getBounding" + "Cl" + "ientRect"]();
+            const canvasRect = this.dom.canvas["getBounding" + "Cl" + "ientRect"]();
+            const canvasLeft = canvasRect.left - scrollRect.left + this.dom.canvasScroll.scrollLeft;
+            const canvasTop = canvasRect.top - scrollRect.top + this.dom.canvasScroll.scrollTop;
+
+            this.dom.canvasScroll.scrollLeft = canvasLeft + imageX * this.state.zoom - mouseX;
+            this.dom.canvasScroll.scrollTop = canvasTop + imageY * this.state.zoom - mouseY;
+          });
+        }
+      }
+
+      fitToViewport() {
+        const area = this.dom.canvasScroll.parentElement;
+        const padding = 48;
+        this.state.fitZoom = Math.min(
+          (area.offsetWidth - padding) / this.dom.canvas.width,
+          (area.offsetHeight - padding) / this.dom.canvas.height,
+          1
+        );
+        this.applyZoom(this.state.fitZoom);
+      }
+    }
+
+    class ViewerController {
+      constructor(
+        state,
+        dom,
+        apiGateway,
+        notificationService,
+        sliceRenderer,
+        viewerBarRenderer,
+        canvasSelectionController,
+        zoomController
+      ) {
+        this.state = state;
+        this.dom = dom;
+        this.apiGateway = apiGateway;
+        this.notificationService = notificationService;
+        this.sliceRenderer = sliceRenderer;
+        this.viewerBarRenderer = viewerBarRenderer;
+        this.canvasSelectionController = canvasSelectionController;
+        this.zoomController = zoomController;
+      }
+
+      async selectImage(folder, imageName) {
+        this.cancelSelection();
+        this.state.currentFolder = folder;
+        this.state.currentImage = imageName;
+        this.viewerBarRenderer.renderIdle();
+
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.src = this.apiGateway.imageUrl(folder, imageName);
+
+        image.onload = () => {
+          this.state.loadedImage = image;
+          this.dom.canvas.width = image.naturalWidth;
+          this.dom.canvas.height = image.naturalHeight;
+          this.dom.context.drawImage(image, 0, 0);
+          this.dom.welcomeMessage.style.display = 'none';
+          this.dom.canvas.style.display = 'block';
+          this.dom.zoomBadge.style.display = 'block';
+          this.dom.hintBar.style.display = 'block';
+          this.dom.hintBar.textContent = 'Press W to start selection';
+          this.zoomController.fitToViewport();
+        };
+
+        await this.sliceRenderer.loadSlices(imageName);
+      }
+
+      enterSelectionMode() {
+        if (!this.state.currentImage || this.dom.canvas.style.display === 'none') {
+          return;
+        }
+
+        this.state.selectionMode = selectionState.drawing;
+        this.state.dragStart = null;
+        this.state.dragEnd = null;
+        this.state.finalCrop = null;
+        this.state.isMouseDown = false;
+        this.dom.canvas.style.cursor = 'crosshair';
+        this.dom.hintBar.textContent = 'Click and drag to select an area. ESC cancels.';
+        this.dom.hintBar.style.display = 'block';
+        this.viewerBarRenderer.renderDrawing();
+        this.canvasSelectionController.redrawImage();
+      }
+
+      cancelSelection() {
+        this.state.resetSelection();
+        this.dom.canvas.style.cursor = 'default';
+        this.canvasSelectionController.redrawImage();
+
+        if (this.state.currentImage) {
+          this.dom.hintBar.textContent = 'Press W to start selection';
+          this.dom.hintBar.style.display = 'block';
+          this.viewerBarRenderer.renderIdle();
+        }
+      }
+
+      async confirmSlice() {
+        if (!this.state.finalCrop || !this.state.currentImage) {
+          return;
+        }
+
+        const temporaryCanvas = document.createElement('canvas');
+        temporaryCanvas.width = this.state.finalCrop.width;
+        temporaryCanvas.height = this.state.finalCrop.height;
+        temporaryCanvas.getContext('2d').drawImage(
+          this.state.loadedImage,
+          this.state.finalCrop.x,
+          this.state.finalCrop.y,
+          this.state.finalCrop.width,
+          this.state.finalCrop.height,
+          0,
+          0,
+          this.state.finalCrop.width,
+          this.state.finalCrop.height
+        );
+
+        this.notificationService.flash();
+
+        try {
+          const data = await this.apiGateway.saveSlice(
+            this.state.currentFolder,
+            this.state.currentImage,
+            temporaryCanvas.toDataURL('image/png')
+          );
+          this.notificationService.showToast(`Saved: ${data.saved}`);
+          await this.sliceRenderer.loadSlices(this.state.currentImage);
+        } catch {
+          this.notificationService.showToast('Save failed', true);
+        }
+
+        this.cancelSelection();
+      }
+    }
+
+    class KeyboardController {
+      constructor(state, viewerController, zoomController) {
+        this.state = state;
+        this.viewerController = viewerController;
+        this.zoomController = zoomController;
+      }
+
+      bindEvents() {
+        document.addEventListener('keydown', (event) => {
+          const activeTagName = document.activeElement.tagName;
+
+          if (['INPUT', 'TEXTAREA'].includes(activeTagName)) {
+            return;
+          }
+
+          if (event.key === 'w' || event.key === 'W') {
+            event.preventDefault();
+
+            if (this.state.selectionMode === selectionState.idle) {
+              this.viewerController.enterSelectionMode();
+            } else if (this.state.selectionMode === selectionState.ready) {
+              this.viewerController.confirmSlice();
+            }
+          }
+
+          if (event.key === 'Escape') {
+            this.viewerController.cancelSelection();
+          }
+
+          if (event.key === '0' && this.state.loadedImage) {
+            this.zoomController.applyZoom(this.state.fitZoom);
+          }
+
+          if (event.key === '1' && this.state.loadedImage) {
+            this.zoomController.applyZoom(1);
+          }
+        });
+      }
+    }
+
+    class ImageSlicerApplication {
+      constructor() {
+        this.state = new ApplicationState();
+        this.dom = new DomRegistry();
+        this.apiGateway = new ApiGateway();
+        this.notificationService = new NotificationService(this.dom);
+        this.sliceRenderer = new SliceRenderer(this.state, this.dom, this.apiGateway);
+        this.viewerBarRenderer = new ViewerBarRenderer(
+          this.state,
+          this.dom,
+          this.sliceRenderer
+        );
+        this.canvasSelectionController = new CanvasSelectionController(
+          this.state,
+          this.dom,
+          this.viewerBarRenderer
+        );
+        this.zoomController = new ZoomController(this.state, this.dom);
+        this.viewerController = new ViewerController(
+          this.state,
+          this.dom,
+          this.apiGateway,
+          this.notificationService,
+          this.sliceRenderer,
+          this.viewerBarRenderer,
+          this.canvasSelectionController,
+          this.zoomController
+        );
+        this.browserRenderer = new BrowserRenderer(
+          this.state,
+          this.dom,
+          this.apiGateway,
+          this.notificationService,
+          this.viewerController
+        );
+        this.keyboardController = new KeyboardController(
+          this.state,
+          this.viewerController,
+          this.zoomController
+        );
+      }
+
+      start() {
+        this.dom.navigateUpButton.addEventListener('click', () => {
+          this.browserRenderer.browseUp();
+        });
+        this.canvasSelectionController.bindEvents();
+        this.zoomController.bindEvents();
+        this.keyboardController.bindEvents();
+        this.browserRenderer.browse('.');
+      }
+    }
+
+    window.imageSlicerApp = new ImageSlicerApplication();
+    window.imageSlicerApp.start();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Text Review</title>
+<style>
+:root {
+  --background:#0e1117;
+  --surface:#161b27;
+  --panel:#1e2535;
+  --border:#2a3347;
+  --border-strong:#3a4560;
+  --text:#cdd6f4;
+  --muted:#7d8fb3;
+  --faint:#3d4f73;
+  --accent:#89b4fa;
+  --accent-alt:#74c7ec;
+  --success:#a6e3a1;
+  --warning:#f9e2af;
+  --danger:#f38ba8;
+  --mauve:#cba6f7;
+  --peach:#fab387;
+  --component-M:#89b4fa;
+  --component-I:#f9e2af;
+  --component-N:#a6e3a1;
+  --component-D:#cba6f7;
+  --component-S:#74c7ec;
+  --component-P:#fab387;
+  --component-A:#f38ba8;
+  --component-C:#94e2d5;
+  --component-E:#b4befe;
+  --font-mono:ui-monospace,"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --font-sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --radius:6px;
+  --transition:150ms ease;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--background);
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-size:14px;
+  line-height:1.6;
+}
+
+#app{
+  display:grid;
+  height:100vh;
+  grid-template-rows:44px 1fr;
+  grid-template-columns:1fr;
+}
+
+#topbar{
+  display:flex;
+  grid-row:1;
+  align-items:center;
+  gap:12px;
+  padding:0 16px;
+  user-select:none;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+
+.logo{
+  color:var(--accent);
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.06em;
+  white-space:nowrap;
+}
+
+.spacer{flex:1}
+
+.counter{
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:12px;
+}
+
+.counter strong{color:var(--text)}
+
+.badge{
+  padding:2px 7px;
+  border-radius:99px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.05em;
+}
+
+.badge-ok{color:var(--success);background:#1e3a28}
+.badge-warn{color:var(--warning);background:#3a2a0e}
+.badge-err{color:var(--danger);background:#3a1a1a}
+.badge-info{color:var(--accent-alt);background:#1a2a3a}
+.badge-dirty{color:var(--mauve);background:#2a1e38}
+
+.shortcuts{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.key{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:20px;
+  padding:1px 5px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:4px;
+}
+
+.key-label{
+  margin-right:2px;
+  color:var(--faint);
+  font-size:10px;
+}
+
+.top-button{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:3px 10px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  background:transparent;
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  transition:background var(--transition),color var(--transition);
+}
+
+.top-button:hover{
+  color:var(--text);
+  background:var(--panel);
+}
+
+.button-save{color:var(--success);border-color:var(--success)}
+.button-save:hover{background:#1a2e1e}
+.button-revert{color:var(--danger);border-color:var(--danger)}
+.button-revert:hover{background:#2e1a1a}
+.button-nav{color:var(--accent);border-color:var(--accent)}
+.button-nav:hover{background:#1a2338}
+
+#main{
+  display:grid;
+  grid-row:2;
+  grid-template-columns:1fr 360px;
+  overflow:hidden;
+}
+
+#text-pane{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-right:1px solid var(--border);
+}
+
+#text-header{
+  display:flex;
+  flex-shrink:0;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+
+.file-id{
+  color:var(--accent);
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+}
+
+.file-name{
+  max-width:420px;
+  overflow:hidden;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.needs-review-indicator{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  color:var(--warning);
+  font-family:var(--font-mono);
+  font-size:10px;
+}
+
+.needs-review-dot{
+  width:6px;
+  height:6px;
+  background:var(--warning);
+  border-radius:50%;
+}
+
+#progress-wrap{
+  flex-shrink:0;
+  height:3px;
+  background:var(--panel);
+}
+
+#progress-bar{
+  height:100%;
+  background:var(--accent);
+  transition:width 300ms ease;
+}
+
+#text-body{
+  flex:1;
+  padding:16px 20px;
+  overflow-y:auto;
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.loading{
+  color:var(--muted);
+  font-style:italic;
+}
+
+#edit-pane{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:var(--surface);
+}
+
+#edit-header{
+  flex-shrink:0;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+}
+
+.meta-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+
+.meta-chip{
+  padding:2px 7px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+
+.meta-chip span{color:var(--text)}
+
+#mindspace-panel{
+  flex-shrink:0;
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+}
+
+.panel-title{
+  margin-bottom:9px;
+  color:var(--faint);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+.mindspace-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+}
+
+.component-button{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  padding:7px 10px;
+  user-select:none;
+  cursor:pointer;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  transition:all var(--transition);
+}
+
+.component-button:hover{
+  background:var(--background);
+  border-color:var(--border-strong);
+}
+
+.component-button.active{
+  background:color-mix(in srgb,var(--component-color) 10%,var(--panel));
+  border-color:var(--component-color);
+  border-width:1.5px;
+}
+
+.component-inner{
+  display:flex;
+  flex:1;
+  flex-direction:column;
+}
+
+.component-letter{
+  font-family:var(--font-mono);
+  font-size:14px;
+  font-weight:600;
+}
+
+.component-name{
+  margin-top:1px;
+  color:var(--muted);
+  font-size:9px;
+  white-space:nowrap;
+}
+
+.component-check{
+  display:flex;
+  flex-shrink:0;
+  align-items:center;
+  justify-content:center;
+  width:14px;
+  height:14px;
+  border:1.5px solid var(--border-strong);
+  border-radius:3px;
+  transition:all var(--transition);
+}
+
+.component-check svg{display:none}
+
+.component-button.active .component-letter{color:var(--component-color)}
+.component-button.active .component-check{
+  background:color-mix(in srgb,var(--component-color) 20%,transparent);
+  border-color:var(--component-color);
+}
+.component-button.active .component-check svg{display:block}
+.component-button.active .component-check svg path{stroke:var(--component-color)}
+
+.component-M{--component-color:var(--component-M)}
+.component-I{--component-color:var(--component-I)}
+.component-N{--component-color:var(--component-N)}
+.component-D{--component-color:var(--component-D)}
+.component-S{--component-color:var(--component-S)}
+.component-P{--component-color:var(--component-P)}
+.component-A{--component-color:var(--component-A)}
+.component-C{--component-color:var(--component-C)}
+.component-E{--component-color:var(--component-E)}
+
+#fields-panel{
+  flex-shrink:0;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+}
+
+.field-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:7px;
+}
+
+.field-row:last-child{margin-bottom:0}
+
+.field-label{
+  flex-shrink:0;
+  width:100px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+}
+
+.field-select{
+  flex:1;
+  padding:4px 8px;
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:12px;
+  outline:none;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  transition:border-color var(--transition);
+}
+
+.field-select:focus{border-color:var(--accent)}
+.field-select option{background:var(--surface)}
+
+#justification-panel{
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  min-height:0;
+  padding:10px 14px;
+  overflow:hidden;
+}
+
+#justification-panel .panel-title{flex-shrink:0}
+
+#justification-textarea{
+  flex:1;
+  min-height:80px;
+  padding:8px 10px;
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-size:12.5px;
+  line-height:1.6;
+  resize:none;
+  outline:none;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  transition:border-color var(--transition);
+}
+
+#justification-textarea:focus{border-color:var(--accent)}
+
+#review-panel{
+  flex-shrink:0;
+  padding:8px 14px;
+  border-top:1px solid var(--border);
+}
+
+.review-flag{
+  padding:4px 8px;
+  color:var(--warning);
+  font-family:var(--font-mono);
+  font-size:10px;
+  background:#2a2010;
+  border:1px solid #5a4010;
+  border-radius:4px;
+}
+
+.review-none{
+  color:var(--faint);
+  font-family:var(--font-mono);
+  font-size:10px;
+}
+
+#toast-container{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  pointer-events:none;
+}
+
+.toast{
+  padding:10px 16px;
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:500;
+  pointer-events:none;
+  border:1px solid transparent;
+  border-radius:var(--radius);
+  opacity:0;
+  animation:toast-in 200ms ease forwards;
+}
+
+.toast-ok{color:var(--success);background:#1a2e1e;border-color:var(--success)}
+.toast-err{color:var(--danger);background:#2e1a1a;border-color:var(--danger)}
+.toast-info{color:var(--accent);background:#1a2338;border-color:var(--accent)}
+.toast-warn{color:var(--warning);background:#2e280e;border-color:var(--warning)}
+
+@keyframes toast-in{
+  from{opacity:0;transform:translateX(20px)}
+  to{opacity:1;transform:none}
+}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="logo">TEXT REVIEW</div>
+    <span id="csv-badge" class="badge badge-info">loading...</span>
+    <span class="counter">item <strong id="current-index">–</strong> of <strong id="total-count">–</strong></span>
+    <span id="dirty-badge" style="display:none" class="badge badge-dirty">● unsaved</span>
+    <div class="spacer"></div>
+    <div class="shortcuts">
+      <span class="key-label">nav</span>
+      <span class="key">A</span><span class="key">D</span>
+      <span class="key">←</span><span class="key">→</span>
+      <span style="margin:0 4px;color:var(--faint)">|</span>
+      <span class="key-label">save</span><span class="key">B</span>
+      <span class="key-label">revert</span><span class="key">E</span>
+    </div>
+    <button class="top-button button-nav" id="previous-button" title="Previous">Previous</button>
+    <button class="top-button button-nav" id="next-button" title="Next">Next</button>
+    <button class="top-button button-save" id="save-button" title="Save">Save</button>
+    <button class="top-button button-revert" id="revert-button" title="Revert">Revert</button>
+  </div>
+
+  <div id="main">
+    <div id="text-pane">
+      <div id="text-header">
+        <span id="file-id" class="file-id">–</span>
+        <span id="file-name" class="file-name">–</span>
+        <div style="flex:1"></div>
+        <span id="review-indicator" style="display:none" class="needs-review-indicator">
+          <span class="needs-review-dot"></span> needs review
+        </span>
+      </div>
+      <div id="progress-wrap"><div id="progress-bar" style="width:0%"></div></div>
+      <div id="text-body"><span class="loading">Loading...</span></div>
+    </div>
+
+    <div id="edit-pane">
+      <div id="edit-header">
+        <div class="meta-row" id="metadata-chips"></div>
+      </div>
+
+      <div id="mindspace-panel">
+        <div class="panel-title">MINDSPACE components</div>
+        <div class="mindspace-grid" id="component-grid"></div>
+      </div>
+
+      <div id="fields-panel">
+        <div class="field-row">
+          <span class="field-label">primary</span>
+          <select class="field-select" id="field-primary">
+            <option>M</option><option>I</option><option>N</option><option>D</option>
+            <option>S</option><option>P</option><option>A</option><option>C</option>
+            <option>E</option><option>indeterminado</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">nudge/sludge</span>
+          <select class="field-select" id="field-ns">
+            <option value="nudge">nudge</option>
+            <option value="sludge">sludge</option>
+            <option value="indeterminado">indeterminado</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">confidence</span>
+          <select class="field-select" id="field-confidence">
+            <option value="alta">alta</option>
+            <option value="media">media</option>
+            <option value="baixa">baixa</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">needs_review</span>
+          <select class="field-select" id="field-needs-review">
+            <option value="1">1 — yes</option>
+            <option value="0">0 — no</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="justification-panel">
+        <div class="panel-title">Justification</div>
+        <textarea id="justification-textarea" spellcheck="true" placeholder="Classification justification"></textarea>
+      </div>
+
+      <div id="review-panel">
+        <div class="panel-title" style="margin-bottom:5px">Review reasons</div>
+        <div id="review-reasons-text" class="review-none">–</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const componentDefinitions = Object.freeze([
+  { key: 'M', name: 'Messenger' },
+  { key: 'I', name: 'Incentives' },
+  { key: 'N', name: 'Norms' },
+  { key: 'D', name: 'Defaults' },
+  { key: 'S', name: 'Salience' },
+  { key: 'P', name: 'Priming' },
+  { key: 'A', name: 'Affect' },
+  { key: 'C', name: 'Commitments' },
+  { key: 'E', name: 'Ego' },
+]);
+
+class ReviewState {
+  constructor() {
+    this.rows = [];
+    this.fieldnames = [];
+    this.currentIndex = 0;
+    this.dirty = false;
+    this.textLoadToken = null;
+  }
+
+  hasRows() {
+    return this.rows.length > 0;
+  }
+
+  currentRow() {
+    return this.rows[this.currentIndex] || null;
+  }
+
+  setDirty(value) {
+    this.dirty = value;
+  }
+}
+
+class DomRegistry {
+  constructor() {
+    this.csvBadge = document.getElementById('csv-badge');
+    this.currentIndex = document.getElementById('current-index');
+    this.totalCount = document.getElementById('total-count');
+    this.dirtyBadge = document.getElementById('dirty-badge');
+    this.fileId = document.getElementById('file-id');
+    this.fileName = document.getElementById('file-name');
+    this.reviewIndicator = document.getElementById('review-indicator');
+    this.progressBar = document.getElementById('progress-bar');
+    this.textBody = document.getElementById('text-body');
+    this.metadataChips = document.getElementById('metadata-chips');
+    this.componentGrid = document.getElementById('component-grid');
+    this.fieldPrimary = document.getElementById('field-primary');
+    this.fieldNs = document.getElementById('field-ns');
+    this.fieldConfidence = document.getElementById('field-confidence');
+    this.fieldNeedsReview = document.getElementById('field-needs-review');
+    this.justificationTextarea = document.getElementById('justification-textarea');
+    this.reviewReasonsText = document.getElementById('review-reasons-text');
+    this.toastContainer = document.getElementById('toast-container');
+    this.previousButton = document.getElementById('previous-button');
+    this.nextButton = document.getElementById('next-button');
+    this.saveButton = document.getElementById('save-button');
+    this.revertButton = document.getElementById('revert-button');
+  }
+}
+
+class ApiGateway {
+  async getStatus() {
+    return this.fetchJson('/api/status');
+  }
+
+  async getRows() {
+    return this.fetchJson('/api/rows');
+  }
+
+  async getText(index) {
+    return this.fetchJson(`/api/text/${index}`);
+  }
+
+  async saveRow(index, updates) {
+    return this.fetchJson('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, updates }),
+    });
+  }
+
+  async revertRow(index) {
+    return this.fetchJson('/api/revert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index }),
+    });
+  }
+
+  async fetchJson(url, options = undefined) {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+
+    return response.json();
+  }
+}
+
+class NotificationService {
+  constructor(dom) {
+    this.dom = dom;
+  }
+
+  toast(message, type = 'ok') {
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast toast-${type}`;
+    toastElement.textContent = message;
+    this.dom.toastContainer.appendChild(toastElement);
+
+    requestAnimationFrame(() => {
+      toastElement.style.opacity = '1';
+    });
+
+    setTimeout(() => {
+      toastElement.style.transition = 'opacity 300ms';
+      toastElement.style.opacity = '0';
+
+      setTimeout(() => toastElement.remove(), 300);
+    }, 2500);
+  }
+
+  showFatalError(error) {
+    document.body.innerHTML = `
+      <div style="padding:40px;font-family:monospace;color:#f38ba8;background:#0e1117;height:100vh">
+        <div style="font-size:16px;margin-bottom:12px">Initialization failed</div>
+        <div style="color:#cdd6f4;font-size:13px;white-space:pre-wrap">${error.stack || error.message || String(error)}</div>
+      </div>
+    `;
+  }
+}
+
+class StatusRenderer {
+  constructor(dom) {
+    this.dom = dom;
+  }
+
+  render(statusPayload) {
+    if (statusPayload.has_working) {
+      this.dom.csvBadge.textContent = statusPayload.working_csv.split('/').pop();
+      this.dom.csvBadge.className = 'badge badge-ok';
+      return;
+    }
+
+    if (statusPayload.has_original) {
+      this.dom.csvBadge.textContent = 'source available';
+      this.dom.csvBadge.className = 'badge badge-warn';
+      return;
+    }
+
+    this.dom.csvBadge.textContent = 'source unavailable';
+    this.dom.csvBadge.className = 'badge badge-err';
+  }
+}
+
+class ComponentGridRenderer {
+  constructor(state, dom) {
+    this.state = state;
+    this.dom = dom;
+  }
+
+  build() {
+    this.dom.componentGrid.innerHTML = '';
+
+    componentDefinitions.forEach((component) => {
+      const button = document.createElement('div');
+      button.className = `component-button component-${component.key}`;
+      button.dataset.key = component.key;
+      button.innerHTML = `
+        <div class="component-inner">
+          <span class="component-letter">${component.key}</span>
+          <span class="component-name">${component.name}</span>
+        </div>
+        <div class="component-check">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+      `;
+      button.addEventListener('click', () => this.toggle(component.key));
+      this.dom.componentGrid.appendChild(button);
+    });
+  }
+
+  toggle(componentKey) {
+    const button = document.querySelector(`.component-button.component-${componentKey}`);
+    button.classList.toggle('active');
+    this.markDirty();
+  }
+
+  setValues(row) {
+    componentDefinitions.forEach((component) => {
+      const button = document.querySelector(`.component-button.component-${component.key}`);
+
+      if (!button) {
+        return;
+      }
+
+      const value = row[component.key];
+
+      if (value === '1' || value === 1 || value === true) {
+        button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
+    });
+  }
+
+  markDirty() {
+    this.state.setDirty(true);
+    this.dom.dirtyBadge.style.display = 'inline-block';
+  }
+}
+
+class TextRenderer {
+  constructor(state, dom, apiGateway) {
+    this.state = state;
+    this.dom = dom;
+    this.apiGateway = apiGateway;
+  }
+
+  async load(index) {
+    if (this.state.textLoadToken) {
+      this.state.textLoadToken.aborted = true;
+    }
+
+    const token = { aborted: false };
+    this.state.textLoadToken = token;
+    this.dom.textBody.innerHTML = '<span class="loading">Loading text...</span>';
+
+    try {
+      const payload = await this.apiGateway.getText(index);
+
+      if (token.aborted) {
+        return;
+      }
+
+      if (payload.found) {
+        this.dom.textBody.textContent = payload.text;
+      } else {
+        const span = document.createElement('span');
+        span.style.color = 'var(--danger)';
+        span.textContent = payload.text;
+        this.dom.textBody.innerHTML = '';
+        this.dom.textBody.appendChild(span);
+      }
+
+      this.dom.textBody.scrollTop = 0;
+    } catch (error) {
+      if (!token.aborted) {
+        const span = document.createElement('span');
+        span.style.color = 'var(--danger)';
+        span.textContent = `Text load failed: ${error.message}`;
+        this.dom.textBody.innerHTML = '';
+        this.dom.textBody.appendChild(span);
+      }
+    }
+  }
+}
+
+class RowRenderer {
+  constructor(state, dom, componentRenderer, textRenderer) {
+    this.state = state;
+    this.dom = dom;
+    this.componentRenderer = componentRenderer;
+    this.textRenderer = textRenderer;
+  }
+
+  render(index) {
+    if (!this.state.hasRows()) {
+      this.renderEmptyState();
+      return;
+    }
+
+    this.state.currentIndex = Math.max(0, Math.min(index, this.state.rows.length - 1));
+    const row = this.state.currentRow();
+
+    this.dom.currentIndex.textContent = this.state.currentIndex + 1;
+    this.dom.progressBar.style.width = (
+      (this.state.currentIndex + 1) / this.state.rows.length * 100
+    ).toFixed(1) + '%';
+    this.dom.fileId.textContent = row.id || '–';
+    this.dom.fileName.textContent = row.filename || '–';
+
+    const needsReview = row.needs_review === '1' || row.needs_review === true;
+    this.dom.reviewIndicator.style.display = needsReview ? 'inline-flex' : 'none';
+
+    this.renderMetadata(row);
+    this.componentRenderer.setValues(row);
+    this.setSelectValue(this.dom.fieldPrimary, row.primary || 'indeterminado');
+    this.setSelectValue(this.dom.fieldNs, row.nudge_or_sludge || 'indeterminado');
+    this.setSelectValue(this.dom.fieldConfidence, row.confidence || 'baixa');
+    this.setSelectValue(this.dom.fieldNeedsReview, row.needs_review != null ? String(row.needs_review) : '0');
+    this.dom.justificationTextarea.value = row.justificativa || '';
+    this.renderReviewReasons(row);
+
+    this.state.setDirty(false);
+    this.dom.dirtyBadge.style.display = 'none';
+    this.textRenderer.load(this.state.currentIndex);
+  }
+
+  renderEmptyState() {
+    this.dom.currentIndex.textContent = '0';
+    this.dom.fileId.textContent = 'No records loaded';
+    this.dom.fileName.textContent = 'Check whether the configured source CSV exists.';
+    this.dom.textBody.textContent = 'No item loaded.';
+    this.dom.textBody.style.color = 'var(--warning)';
+  }
+
+  renderMetadata(row) {
+    this.dom.metadataChips.innerHTML = '';
+
+    [
+      ['year', row.ano],
+      ['window', row.janela],
+      ['date', row.complaint_date],
+    ].forEach(([label, value]) => {
+      const chip = document.createElement('span');
+      chip.className = 'meta-chip';
+      chip.innerHTML = `${label} <span>${value || '–'}</span>`;
+      this.dom.metadataChips.appendChild(chip);
+    });
+  }
+
+  renderReviewReasons(row) {
+    if (row.review_reasons) {
+      this.dom.reviewReasonsText.textContent = row.review_reasons;
+      this.dom.reviewReasonsText.className = 'review-flag';
+      return;
+    }
+
+    this.dom.reviewReasonsText.textContent = '–';
+    this.dom.reviewReasonsText.className = 'review-none';
+  }
+
+  setSelectValue(selectElement, value) {
+    Array.from(selectElement.options).some((option) => {
+      if (option.value === value || option.text === value) {
+        selectElement.value = option.value;
+        return true;
+      }
+
+      return false;
+    });
+  }
+}
+
+class EditCollectionService {
+  collect() {
+    const updates = {};
+
+    componentDefinitions.forEach((component) => {
+      const button = document.querySelector(`.component-button.component-${component.key}`);
+      updates[component.key] = button && button.classList.contains('active') ? '1' : '0';
+    });
+
+    updates.primary = document.getElementById('field-primary').value;
+    updates.nudge_or_sludge = document.getElementById('field-ns').value;
+    updates.confidence = document.getElementById('field-confidence').value;
+    updates.needs_review = document.getElementById('field-needs-review').value;
+    updates.justificativa = document.getElementById('justification-textarea').value;
+
+    return updates;
+  }
+}
+
+class ReviewWorkflowController {
+  constructor(
+    state,
+    dom,
+    apiGateway,
+    notificationService,
+    rowRenderer,
+    editCollectionService
+  ) {
+    this.state = state;
+    this.dom = dom;
+    this.apiGateway = apiGateway;
+    this.notificationService = notificationService;
+    this.rowRenderer = rowRenderer;
+    this.editCollectionService = editCollectionService;
+  }
+
+  bindEvents() {
+    this.dom.fieldPrimary.addEventListener('change', () => this.markDirty());
+    this.dom.fieldNs.addEventListener('change', () => this.markDirty());
+    this.dom.fieldConfidence.addEventListener('change', () => this.markDirty());
+    this.dom.fieldNeedsReview.addEventListener('change', () => this.markDirty());
+    this.dom.justificationTextarea.addEventListener('input', () => this.markDirty());
+    this.dom.saveButton.addEventListener('click', () => this.saveCurrentItem());
+    this.dom.revertButton.addEventListener('click', () => this.revertCurrentItem());
+    this.dom.previousButton.addEventListener('click', () => this.navigate(-1));
+    this.dom.nextButton.addEventListener('click', () => this.navigate(1));
+    document.addEventListener('keydown', (event) => this.handleKeyboard(event));
+  }
+
+  markDirty() {
+    this.state.setDirty(true);
+    this.dom.dirtyBadge.style.display = 'inline-block';
+  }
+
+  async saveCurrentItem() {
+    if (!this.state.hasRows()) {
+      return;
+    }
+
+    const updates = this.editCollectionService.collect();
+
+    try {
+      const response = await this.apiGateway.saveRow(this.state.currentIndex, updates);
+
+      if (response.ok) {
+        Object.assign(this.state.rows[this.state.currentIndex], updates);
+        this.state.setDirty(false);
+        this.dom.dirtyBadge.style.display = 'none';
+        this.notificationService.toast(`Item ${this.state.currentIndex + 1} saved`, 'ok');
+        return;
+      }
+
+      this.notificationService.toast(`Save failed: ${response.error || '?'}`, 'err');
+    } catch {
+      this.notificationService.toast('Save request failed.', 'err');
+    }
+  }
+
+  async revertCurrentItem() {
+    if (!this.state.hasRows()) {
+      return;
+    }
+
+    try {
+      const response = await this.apiGateway.revertRow(this.state.currentIndex);
+
+      if (response.ok) {
+        Object.assign(this.state.rows[this.state.currentIndex], response.row);
+        this.rowRenderer.render(this.state.currentIndex);
+        this.notificationService.toast(`Item ${this.state.currentIndex + 1} reverted`, 'warn');
+        return;
+      }
+
+      this.notificationService.toast(`Revert failed: ${response.error || '?'}`, 'err');
+    } catch {
+      this.notificationService.toast('Revert request failed.', 'err');
+    }
+  }
+
+  async navigate(delta) {
+    if (this.state.dirty) {
+      await this.saveCurrentItem();
+    }
+
+    const nextIndex = this.state.currentIndex + delta;
+
+    if (nextIndex < 0 || nextIndex >= this.state.rows.length) {
+      this.notificationService.toast(delta > 0 ? 'End of list.' : 'Start of list.', 'info');
+      return;
+    }
+
+    this.rowRenderer.render(nextIndex);
+  }
+
+  handleKeyboard(event) {
+    const tagName = document.activeElement.tagName;
+    const isTyping = tagName === 'TEXTAREA' || tagName === 'INPUT';
+
+    if (isTyping) {
+      if (event.key === 'b' || event.key === 'B') {
+        event.preventDefault();
+        this.saveCurrentItem();
+      }
+
+      if (event.key === 'e' || event.key === 'E') {
+        event.preventDefault();
+        this.revertCurrentItem();
+      }
+
+      return;
+    }
+
+    if (event.key === 'ArrowLeft' || event.key === 'a' || event.key === 'A') {
+      event.preventDefault();
+      this.navigate(-1);
+      return;
+    }
+
+    if (event.key === 'ArrowRight' || event.key === 'd' || event.key === 'D') {
+      event.preventDefault();
+      this.navigate(1);
+      return;
+    }
+
+    if (event.key === 'b' || event.key === 'B') {
+      event.preventDefault();
+      this.saveCurrentItem();
+      return;
+    }
+
+    if (event.key === 'e' || event.key === 'E') {
+      event.preventDefault();
+      this.revertCurrentItem();
+    }
+  }
+}
+
+class ReviewApplication {
+  constructor() {
+    this.state = new ReviewState();
+    this.dom = new DomRegistry();
+    this.apiGateway = new ApiGateway();
+    this.notificationService = new NotificationService(this.dom);
+    this.statusRenderer = new StatusRenderer(this.dom);
+    this.componentRenderer = new ComponentGridRenderer(this.state, this.dom);
+    this.textRenderer = new TextRenderer(this.state, this.dom, this.apiGateway);
+    this.rowRenderer = new RowRenderer(
+      this.state,
+      this.dom,
+      this.componentRenderer,
+      this.textRenderer
+    );
+    this.workflowController = new ReviewWorkflowController(
+      this.state,
+      this.dom,
+      this.apiGateway,
+      this.notificationService,
+      this.rowRenderer,
+      new EditCollectionService()
+    );
+  }
+
+  async start() {
+    try {
+      window.addEventListener('error', (event) => {
+        this.notificationService.showFatalError(event.error || event);
+      });
+      window.addEventListener('unhandledrejection', (event) => {
+        this.notificationService.showFatalError(event.reason);
+      });
+
+      const statusPayload = await this.apiGateway.getStatus();
+      this.statusRenderer.render(statusPayload);
+
+      const rowsPayload = await this.apiGateway.getRows();
+      this.state.rows = rowsPayload.rows || [];
+      this.state.fieldnames = rowsPayload.fieldnames || [];
+      this.dom.totalCount.textContent = this.state.rows.length;
+
+      const firstReviewIndex = this.state.rows.findIndex((row) => (
+        row.needs_review === '1' || row.needs_review === true
+      ));
+      this.state.currentIndex = firstReviewIndex >= 0 ? firstReviewIndex : 0;
+
+      this.componentRenderer.build();
+      this.workflowController.bindEvents();
+      this.rowRenderer.render(this.state.currentIndex);
+    } catch (error) {
+      this.notificationService.showFatalError(error);
+    }
+  }
+}
+
+window.reviewApplication = new ReviewApplication();
+window.reviewApplication.start();
+</script>
+</body>
+</html>

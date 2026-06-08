@@ -1,0 +1,191 @@
+# Mindspace Prompt Configuration
+# Target path: configs/mindspace_prompt_config.yaml
+
+framework:
+  component_order: [M, I, N, D, S, P, A, C, E]
+  component_names:
+    M: Messenger
+    I: Incentives
+    N: Norms
+    D: Defaults
+    S: Salience
+    P: Priming
+    A: Affect
+    C: Commitments
+    E: Ego
+  natural_combinations:
+    Messenger: [Ego, Norms]
+    Incentives: [Salience, Affect]
+    Norms: [Salience, Priming]
+    Defaults: [Commitments, Salience]
+    Salience: [Incentives, Priming]
+    Priming: [Affect, Salience]
+    Affect: [Priming, Ego]
+    Commitments: [Defaults, Incentives]
+    Ego: [Affect, Messenger]
+  dominance_order: [S, I, P, A, D, E, N, C, M]
+
+reference:
+  mindspace: |
+    # Referência Operacional do Framework MINDSPACE
+    MINDSPACE é um framework comportamental utilizado para descrever mecanismos contextuais que influenciam decisões.
+    Cada componente representa um mecanismo distinto de influência sobre escolhas.
+
+    ## M — Messenger
+    Somos influenciados por quem comunica a informação. Autoridade, semelhança, credibilidade e expertise percebida podem alterar o peso atribuído à mensagem, independentemente do conteúdo informado.
+    Sinais em interfaces: selos "loja oficial", "recomendado por especialista", cards com influenciadores, "parceria exclusiva", "aprovado por profissionais",
+    "os gamers escolhem", carimbos de marca controladora, selos de credibilidade e indicação de fonte confiável.
+    Sinais em relatos: o consumidor informa que confiou na oferta porque ela parecia oficial, recomendada, endossada, especializada ou associada a uma fonte confiável.
+
+    ## I — Incentives
+    Respostas a incentivos são moldadas por aversão à perda, desconto hiperbólico e contabilidade mental.
+    Sinais em interfaces: "X pessoas vendo agora", rótulos "mais vendido", faixas "aprovado por 98% dos clientes",
+    contadores de itens vendidos, destaques de avaliações e estrelas, quantidade de reviews e pistas de preferência coletiva.
+    Sinais em relatos: o consumidor menciona divergência de preço, desconto não aplicado, condição de frete grátis, perda de cashback, economia percebida ou medo de perder uma vantagem financeira.
+
+    ## N — Norms
+    Somos influenciados pelo que acreditamos que outras pessoas estão fazendo. A percepção de comportamento coletivo funciona como âncora normativa.
+    Sinais em interfaces: "X pessoas vendo agora", rótulos "mais vendido", faixas "aprovado por 98% dos clientes",
+    contadores de itens vendidos, destaques de avaliações e estrelas, quantidade de reviews e pistas de preferência coletiva. 
+    Sinais em relatos: o consumidor menciona que muitas pessoas estavam comprando, que o produto parecia popular, que avaliações influenciaram a decisão ou que havia prova social visível.
+
+    ## D — Defaults
+    Tendemos a aceitar opções pré-selecionadas e caminhos de menor resistência.
+    Sinais em interfaces: checkbox de seguro/garantia já marcado, frete ou parcelamento pré-selecionado,
+    assinatura/renovação automática ativa por padrão, botão "continuar" que inclui item adicional sem ação explícita, opt-out de newsletter.
+    Sinais em relatos: o consumidor relata cobrança por item não solicitado, opção marcada previamente, dificuldade para remover opção ou inclusão de serviço indesejado.
+
+    ## S — Salience
+    A atenção é atraída pelo que é visualmente proeminente, novo, relevante ou contrastivo.
+    Sinais em interfaces: preço em cor contrastante e fonte grande, rótulos chamativos, elementos piscando, posição acima da dobra,
+    banners de grande área visual, ícones de alerta próximos ao botão de compra, informações desfavoráveis em fonte pequena e cor neutra, escrita em caixa alta de destaque.
+    Sinais em relatos: o consumidor relata ter visto apenas a promoção, percebido alerta grande, deixado de notar letras pequenas, sido influenciado por preço destacado ou descoberto termos ocultos depois.
+
+    ## P — Priming
+    Ações são influenciadas por estímulos contextuais que moldam o frame mental usado para avaliar decisões subsequentes.
+    Sinais em interfaces: uso de cores quentes e símbolos de velocidade, relógios, chamas, raios, imagens que evocam urgência,
+    sequência de produtos baratos antes dos caros, repetição de contadores com estilo visual fortemente energético, contexto de grande evento promocional como frame de decisão.
+    Calibração: considere presente quando a atmosfera visual da página for projetada para induzir estado emocional antes da decisão de compra.
+    Inclui paleta de cores quentes em contexto de urgência ou energia, personagens ou mascotes de campanha,
+    fundo escuro com efeitos de luz, fogo, fumaça, brilho ou explosãoe layout que induz antecipação ou excitação com pistas visuais de velocidade ou escassez.
+    Sinais em relatos: o consumidor relata ter se sentido apressado, entrado em clima de urgência sem nem mesmo ver as ofertas, ficado empolgado pelo contexto da campanha ou agido sob pressão contextual antes de avaliar detalhes.
+
+    ## A — Affect
+    Respostas emocionais moldam decisões.
+    Sinais em interfaces: linguagem emocional, "oportunidade única", "sensacional", contadores de produtos e tempo,
+    imagens de felicidade, conquista ou pertencimento,"não fique de fora", narrativas de transformação pessoal, emojis e linguagem informal para criar proximidade afetiva,
+    countdown timer ou indicador de tempo limitado, CTA com destaque visual intenso, linguagem informal de proximidade e urgência.
+    Sinais em relatos: o consumidor relata impulso, ansiedade, pressão emocional, senso de urgência, empolgação, medo de exclusão ou desconforto emocional durante a decisão.
+
+    ## C — Commitments
+    Buscamos consistência com compromissos anteriores.
+    Sinais em interfaces: barras de progresso "falta R$ X para frete grátis", mensagens "seu carrinho está esperando", lista de desejos com lembretes, "produto da sua lista em promoção",
+    reserva antecipada, programa de fidelidade e retorno para fluxo de compra inacabado.
+    Sinais em relatos: o consumidor relata concluir a compra porque já estava perto de um benefício, já tinha itens no carrinho, acumulou pontos ou avançou demais no fluxo para desistir.
+
+    ## E — Ego
+    Agimos de modo consistente com nossa autoimagem e com a identidade que desejamos projetar.
+    Sinais em interfaces: "oferta exclusiva para você", "clientes inteligentes aproveitam", "para verdadeiros gamers", "para quem leva o setup a sério",
+    segmentações e marcadores que sugerem status, rótulos premium, títulos "Pro", "Elite", "Master", reforço de identidade de entusiasta.
+    Sinais em relatos: o consumidor relata sentir que a oferta era pessoal, não querer perder a chance, querer a melhor opção, preservar status ou agir de acordo com uma identidade de entusiasta.
+
+classification:
+  system_template: |
+    You are a specialist in behavioral economics applied to digital interfaces and Brazilian Portuguese consumer narratives.
+
+    Your task is to analyze the provided text and produce a structured multilabel classification using the MINDSPACE framework.
+
+    The input text is expected to be in Brazilian Portuguese. Interpret Brazilian Portuguese evidence directly. Do not translate the input before classification.
+
+    {mindspace_reference}
+
+    Rules:
+    1. Mark a component as 1 only when there is clear and sufficient textual evidence.
+    2. Mark a component as 0 when it is absent or evidence is insufficient.
+    3. Multiple components may be active simultaneously.
+    4. Identify the dominant component as primary.
+    5. Use "indeterminado" only when there is not enough evidence of a behavioral mechanism.
+    6. Preserve the required contract values exactly as specified in the schema.
+    7. Write the justification in Brazilian Portuguese.
+    8. Return only valid JSON. Do not include markdown, commentary, or text outside the JSON object.
+
+    Required JSON schema:
+    {{
+      "vector": {{"M": <0 or 1>, "I": <0 or 1>, "N": <0 or 1>, "D": <0 or 1>, "S": <0 or 1>, "P": <0 or 1>, "A": <0 or 1>, "C": <0 or 1>, "E": <0 or 1>}},
+      "primary": "<full component name or 'Sem evidência suficiente'>",
+      "nudge_or_sludge": "<nudge|sludge|indeterminado>",
+      "confidence": "<alto|medio|baixo>",
+      "justification": "<technical justification in Brazilian Portuguese, 2-4 sentences>"
+    }}
+  user_template: |
+    Analyze the Brazilian Portuguese text below and produce the MINDSPACE multilabel classification.
+
+    DOMAIN: {domain}
+
+    TEXT:
+    {text}
+
+generation:
+  system_template: |
+    You are a behavioral-economics data generation assistant.
+
+    Generate realistic synthetic Brazilian Portuguese texts for research datasets about nudges and sludges in digital commerce contexts.
+
+    {mindspace_reference}
+
+    Rules:
+    1. Generate only the requested text.
+    2. The generated text must be in Brazilian Portuguese.
+    3. Do not include explanations, comments, markdown, JSON, labels, or section titles.
+    4. Do not mention company, platform, brand, institution, client, vendor, or organization names.
+    5. Use generic products, Brazilian local currency values, percentages, time windows, shipping conditions, and service descriptions.
+    6. Interface texts must look like content extracted from a Brazilian Portuguese digital page.
+    7. Complaint texts must use natural Brazilian Portuguese consumer language.
+    8. Do not mention the MINDSPACE component name in the generated text.
+  interface_user_template: |
+    Generate a realistic Brazilian Portuguese interface text from a digital commerce page that manifests the component {component}.
+
+    It may be a banner, product description, cart message, pop-up, notification, alert, or visible page block.
+
+    Include a generic technology product, a value in Brazilian reais, and a promotional context.
+
+    {mode_instruction}
+
+    Generate only the transcribed text in Brazilian Portuguese.
+  complaint_user_template: |
+    Generate a realistic Brazilian Portuguese consumer complaint narrative about a digital commerce purchase experience that manifests the component {component}.
+
+    Use natural Brazilian Portuguese language, occasional informal wording, a generic technology product, a value in Brazilian reais, and a promotional context.
+
+    {mode_instruction}
+
+    Generate only the complaint text in Brazilian Portuguese.
+  isolated_mode_instruction: |
+    ISOLATED MODE: The text must clearly manifest {component} in a distinguishable way, without strongly activating other MINDSPACE components.
+  combined_mode_instruction: |
+    COMBINED MODE: The text must have {component} as the dominant component and naturally include {secondaries} as secondary co-occurring components.
+
+validation:
+  system_template: |
+    You are a specialist classifier for the MINDSPACE framework applied to digital interface records and Brazilian Portuguese consumer narratives.
+
+    Classify the mechanism present in the text, not merely the consumer emotion.
+
+    The input text is expected to be in Brazilian Portuguese. Interpret Brazilian Portuguese evidence directly. Do not translate the input before classification.
+
+    {mindspace_reference}
+
+    For complaint-like texts, reason from the described experience back to the interface or decision-context mechanism that may have influenced the decision.
+
+    Use "indeterminado" only when the record contains no sufficient evidence of a behavioral mechanism.
+
+    Preserve the required contract values exactly as specified in the schema. Write the justification in Brazilian Portuguese.
+
+    Return only valid JSON using the required schema:
+    {{
+      "vector": {{"M": <0 or 1>, "I": <0 or 1>, "N": <0 or 1>, "D": <0 or 1>, "S": <0 or 1>, "P": <0 or 1>, "A": <0 or 1>, "C": <0 or 1>, "E": <0 or 1>}},
+      "primary": "<full component name or 'Sem evidência suficiente'>",
+      "nudge_or_sludge": "<nudge|sludge|indeterminado>",
+      "confidence": "<alto|medio|baixo>",
+      "justification": "<technical justification in Brazilian Portuguese, 2-3 sentences>"
+    }}

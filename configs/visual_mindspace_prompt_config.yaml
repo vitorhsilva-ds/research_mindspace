@@ -1,0 +1,164 @@
+# Visual Mindspace Prompt Configuration
+# Target path: configs/visual_mindspace_prompt_config.yaml
+
+framework:
+  component_order: [M, I, N, D, S, P, A, C, E]
+  component_names:
+    M: Messenger
+    I: Incentives
+    N: Norms
+    D: Defaults
+    S: Salience
+    P: Priming
+    A: Affect
+    C: Commitments
+    E: Ego
+  dominance_order: [I, S, A, P, M, N, C, E, D]
+
+reference:
+  system_prompt: |
+    You are a specialist in choice architecture and nudge theory, with a focus on the MINDSPACE framework applied to digital commerce interfaces.
+
+    Your task is to accurately describe visible visual and textual elements in screenshots of digital commerce interfaces and identify observable cues that may indicate MINDSPACE components: Messenger, Incentives, Norms, Defaults, Salience, Priming, Affect, Commitments, and Ego.
+
+    The image content and visible interface text are expected to be in Brazilian Portuguese. Interpret Brazilian Portuguese evidence directly.
+
+    Be objective, descriptive, and factual. Do not infer intentions. Describe only what is visible.
+
+  component_reference: |
+    ## M — Messenger
+    Somos influenciados por quem comunica a informação.
+    Autoridade, semelhança e prestígio percebidos do emissor alteram o peso atribuído à mensagem, independentemente do conteúdo.
+    Sinais em interfaces: selos "loja oficial", "recomendado por especialista", cards com influenciadores, "parceria exclusiva", "aprovado por profissionais",
+    "os gamers escolhem", carimbos de marca controladora, selos de credibilidade e indicação de fonte confiável.
+
+
+    ## I — Incentives
+    Respostas a incentivos são moldadas por aversão à perda, desconto hiperbólico e contabilidade mental.
+    O enquadramento de custos e benefícios pode produzir efeitos desproporcionais no comportamento.
+    Sinais em interfaces: preço formatos "de/por", selos de desconto "40% OFF", cupons digitáveis, enquadramento de economia como "você economiza R$ X", frete grátis condicionado, cashback,
+    avisos de retorno grátis em caso de cancelamento em "X" dias, benefício por tempo limitado e destaque de vantagem financeira.
+
+    ## N — Norms
+    Somos influenciados pelo que acreditamos ser o comportamento normal do nosso grupo.
+    A percepção do que "os outros fazem" funciona como âncora normativa.
+    Sinais em interfaces: "X pessoas vendo agora", rótulos "mais vendido", faixas "aprovado por 98% dos clientes",
+    contadores de itens vendidos, destaques de avaliações e estrelas, quantidade de reviews e pistas de preferência coletiva.
+
+    ## D — Defaults
+    Tendemos a aceitar a opção pré-selecionada ou o caminho de menor resistência.
+    A inércia é um preditor relevante de comportamento.
+    Sinais em interfaces: checkbox de seguro/garantia já marcado, frete ou parcelamento pré-selecionado,
+    assinatura/renovação automática ativa por padrão, botão "continuar" que inclui item adicional sem ação explícita, opt-out de newsletter.
+
+    ## S — Salience
+    Nossa atenção é atraída pelo que é novo, relevante ou visualmente destacado.
+    Informações salientes podem ter peso desproporcional nas decisões.
+    Sinais em interfaces: preço em cor contrastante e fonte grande, rótulos chamativos, elementos piscando, posição acima da dobra,
+    banners de grande área visual, ícones de alerta próximos ao botão de compra, informações desfavoráveis em fonte pequena e cor neutra, escrita em caixa alta de destaque.
+
+    ## P — Priming
+    Nossos atos são influenciados por estímulos contextuais que moldam o frame mental usado para avaliar decisões subsequentes.
+    Sinais em interfaces: uso de cores quentes e símbolos de velocidade, relógios, chamas, raios, imagens que evocam urgência,
+    sequência de produtos baratos antes dos caros, repetição de contadores com estilo visual fortemente energético, contexto de grande evento promocional como frame de decisão.
+    Calibração: considere presente quando a atmosfera visual da página for projetada para induzir estado emocional antes da decisão de compra.
+    Inclui paleta de cores quentes em contexto de urgência ou energia, personagens ou mascotes de campanha,
+    fundo escuro com efeitos de luz, fogo, fumaça, brilho ou explosãoe layout que induz antecipação ou excitação com pistas visuais de velocidade ou escassez.
+
+    ## A — Affect
+    Respostas emocionais moldam decisões.
+    Estados afetivos influenciam avaliações mesmo quando não são diretamente relevantes para a decisão.
+    Sinais em interfaces: linguagem emocional, "oportunidade única", "sensacional", contadores de produtos e tempo,
+    imagens de felicidade, conquista ou pertencimento,"não fique de fora", narrativas de transformação pessoal, emojis e linguagem informal para criar proximidade afetiva,
+    countdown timer ou indicador de tempo limitado, CTA com destaque visual intenso, linguagem informal de proximidade e urgência.
+
+    ## C — Commitments
+    Buscamos ser consistentes com compromissos anteriores.
+    Mecanismos que ativam compromissos prévios aumentam a probabilidade de ação.
+    Sinais em interfaces: barras de progresso "falta R$ X para frete grátis", mensagens "seu carrinho está esperando", lista de desejos com lembretes, "produto da sua lista em promoção",
+    reserva antecipada, programa de fidelidade e retorno para fluxo de compra inacabado.
+
+    ## E — Ego
+    Agimos de maneiras consistentes com nossa visão de nós mesmos e com a imagem que queremos projetar.
+    Apelos à identidade são motivadores relevantes.
+    Sinais em interfaces: "oferta exclusiva para você", "clientes inteligentes aproveitam", "para verdadeiros gamers", "para quem leva o setup a sério",
+    segmentações e marcadores que sugerem status, rótulos premium, títulos "Pro", "Elite", "Master", reforço de identidade de entusiasta.
+
+calibration:
+  visual_rules: |
+    Calibração obrigatória:
+    1. A paleta de cores da página induz emoção, urgência, energia ou empolgação? Se sim, P/A devem ser considerados.
+    2. Há personagem, mascote ou figura humana na composição visual? Se sim, isso reforça P/A/N.
+    3. O layout usa escuridão, contraste extremo ou efeitos atmosféricos como fogo, luz, fumaça ou brilho? Se sim, isso reforça P/A.
+    4. Há linguagem superlativa visível como "O MAIOR", "MELHOR" ou "NUNCA VISTO"? Se sim, isso reforça A e S.
+    Se qualquer uma das respostas acima for sim, A deve ser reforçado no julgamento como presente com evidências.
+
+schemas:
+  extraction_json_schema: |
+    {
+      "image_metadata": {
+        "tipo_pagina": "<page type>",
+        "paleta_dominante": "<main colors>",
+        "descricao_geral": "<1-2 sentences describing the layout in Brazilian Portuguese>",
+        "layout_geral": "<example: banner_top + product_grid + footer>"
+      },
+      "elementos_visuais_raw": {
+        "textos_principais": ["<visible text list, preserving Brazilian Portuguese as seen>"],
+        "precos_visiveis": ["<visible prices>"],
+        "botoes_cta": ["<button labels, preserving Brazilian Portuguese as seen>"],
+        "badges_selos": ["<badges, seals, labels, preserving Brazilian Portuguese as seen>"],
+        "elementos_destaque": ["<highlighted visual elements described in Brazilian Portuguese>"]
+      },
+      "mindspace": {
+        "M": {"presente": true, "instancias": 0, "evidencias": ["<observed evidence in Brazilian Portuguese>"], "localizacao": "<screen location>"},
+        "I": {"presente": false, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "N": {"presente": false, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "D": {"presente": false, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "S": {"presente": true, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "P": {"presente": true, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "A": {"presente": false, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "C": {"presente": false, "instancias": 0, "evidencias": [], "localizacao": ""},
+        "E": {"presente": false, "instancias": 0, "evidencias": [], "localizacao": ""}
+      },
+      "primary": "<Messenger|Incentives|Norms|Defaults|Salience|Priming|Affect|Commitments|Ego|Sem evidência suficiente>",
+      "nudge_or_sludge": "<nudge|indeterminado>",
+      "texto_para_classificador": "<continuous synthesis in Brazilian Portuguese of all observed visual and textual elements>"
+    }
+
+templates:
+  extraction_user_prompt: |
+    Analyze this screenshot of a digital commerce interface.
+
+    Metadata:
+    ID: {record_id}
+    Page type: {page_type}
+    Year: {year}
+
+    Produce a structured description following exactly the JSON schema below.
+
+    For each MINDSPACE component, describe the visible visual/textual elements that may indicate its presence. If a component is not observable in the image, use false, an empty list, and an empty location.
+
+    The output descriptions, evidence lists, and classifier synthesis must be written in Brazilian Portuguese. Preserve visible interface text as it appears in the image.
+
+    {component_reference}
+
+    {visual_calibration}
+
+    Return only valid JSON. Do not include markdown, commentary, or text outside the JSON object.
+
+    Output schema:
+    {json_schema}
+
+  validation_user_prompt: |
+    Analyze this screenshot of a digital commerce interface and produce a MINDSPACE classification.
+
+    The output descriptions, evidence lists, and classifier synthesis must be written in Brazilian Portuguese. Preserve visible interface text as it appears in the image.
+
+    {component_reference}
+
+    {visual_calibration}
+
+    Return only valid JSON. Do not include markdown, commentary, or text outside the JSON object.
+
+    Output schema:
+    {json_schema}
